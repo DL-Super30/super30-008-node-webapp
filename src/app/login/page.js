@@ -4,7 +4,7 @@ import Image from "next/image";
 import { useSelector, useDispatch } from "react-redux";
 import { useState, useEffect } from "react";
 import { useRouter } from 'next/navigation'
-import { checkLoginStatus, loginApi } from "@/slices/loginSlice";
+import { checkLoginStatus, loginUserApi } from "@/slices/loginSlice";
 
 
 
@@ -16,6 +16,12 @@ export default function Login() {
   const [rememberMe, setRememberMe] = useState(false);
   const router = useRouter();
   const dispatch = useDispatch();
+  const login = useSelector((state) => state.login);
+
+  useEffect(() => {
+    if(login.isLoggedIn){
+    router.push('/dashboard')}
+  }, [login.isLoggedIn]);
   
   useEffect(() => {
   
@@ -71,8 +77,8 @@ export default function Login() {
         localStorage.removeItem("password");
       }
 //  alert("form submitted successfully");
- dispatch(loginApi({userName, password}));
-router.push('/dashboard')
+ dispatch(loginUserApi({name: userName, password}));
+//router.push('/dashboard')
     }
   }; 
 

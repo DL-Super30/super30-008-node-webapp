@@ -5,13 +5,29 @@ import { useSelector } from "react-redux";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { FaChevronDown } from "react-icons/fa";
+import { useDispatch,} from "react-redux";
+import { logout } from "@/slices/loginSlice";
+import { useEffect } from "react";
+import { useRouter } from 'next/navigation'
 
 
 export default function Navbar() {
   const pathname = usePathname();
+  const dispatch = useDispatch();
+  const router = useRouter();
+  const login = useSelector((state) => state.login);
   // const login = useSelector((state) => state.login);
   // console.log(login);
   // if (!login?.isLoggedIn) return null;
+
+  const handleLogout = ()=> {
+dispatch(logout());
+  }
+
+  useEffect(() => {
+    if(!login.isLoggedIn){
+    router.push('/login')}
+  }, [login.isLoggedIn]);
 
   return (
     <div>
@@ -166,6 +182,8 @@ export default function Navbar() {
                     width={30}
                     height={40}
                     className="inline-block"
+                    onClick={handleLogout}
+                
                   />
                 </div>
               </div>

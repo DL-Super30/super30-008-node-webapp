@@ -10,7 +10,7 @@ export default function ClientNavbar() {
   const hideNavbar = pathname === '/';
   const [isLoggedIn, setIsLoggedIn] = useState("");
   const login = useSelector((state) => state.login);
-  console.log(pathname);
+  
 
   useEffect(() => {
     setIsLoggedIn(login.isLoggedIn);
