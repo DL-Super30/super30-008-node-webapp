@@ -4,7 +4,7 @@ import axios from 'axios';
 
 export const loginUserApi = createAsyncThunk('loginUserApi', async (payload) => {
     try {
-        const response = await axios.post('http://localhost:8000/login', payload);
+        const response = await axios.post('http://localhost:4000/api/users/login', payload);
         console.log(response.status);
         return response;
     } catch(error) {
@@ -55,7 +55,7 @@ const loginSlice = createSlice({
 logout: (state, action)=> {
     localStorage.setItem('isLoggedIn', 'false');
             localStorage.setItem('userData', null);
-            
+            localStorage.setItem('accessToken', null);
             state.isLoggedIn = false;
             state.userData = null;
 }
@@ -68,14 +68,15 @@ logout: (state, action)=> {
                 return { ...state, isLoading: true };
             })
             .addCase(loginUserApi.fulfilled, (state, action) => {
-                if (action.payload.status === 200) {
-
+                if (action.payload.status === 200 || action.payload.status === 201) {
+                    console.log(action.payload);
                     localStorage.setItem('isLoggedIn', 'true');
-                    localStorage.setItem('userData', JSON.stringify(action.payload))
+                    localStorage.setItem('userData', JSON.stringify(action.payload.data));
+                    localStorage.setItem('accessToken', action.payload.data.token);
 
-                    return { error: null, isLoggedIn: true, isLoading: false, data: action.payload.message };
+                    return { error: null, isLoggedIn: true, isLoading: false, data: action.payload.data };
                 } else {
-                    return { data: null, isLoggedIn: false, isLoading: false, error: action.payload.message };
+                    return { data: null, isLoggedIn: false, isLoading: false, error: action.payload };
                 }
             })
             .addCase(loginUserApi.rejected, (state, action) => {

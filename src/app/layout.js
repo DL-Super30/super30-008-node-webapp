@@ -5,6 +5,7 @@ import "./globals.css";
 import { Provider } from "react-redux";
 import ClientNavbar from "./navbar/clientNavbar";
 import { store } from "@/store";
+import { usePathname } from "next/navigation";
 // import store from "@/store";
 
 // // Define the Inter font loader at the top level
@@ -17,7 +18,10 @@ import { store } from "@/store";
 // };
 
 export default function RootLayout({ children }) {
+  const pathname = usePathname(); // Get the current route
 
+  // Check if the current page is not the login page
+  const isLoginPage = pathname === "/login";
   return (
     <html lang="en">
       <head>
@@ -26,7 +30,12 @@ export default function RootLayout({ children }) {
       <body>
         <Provider store={store}>
           <ClientNavbar />
+          {!isLoginPage && <ClientNavbar />}
+          
+          {/* Apply padding only if it's not the login page */}
+          <div className={isLoginPage ? "" : "pt-16"}>
           {children}
+          </div>
         </Provider>
       </body>
     </html>

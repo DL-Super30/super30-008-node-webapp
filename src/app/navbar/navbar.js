@@ -31,7 +31,7 @@ dispatch(logout());
 
   return (
     <div>
-      <nav className="pt-4 px-3 shadow-lg shadow-gray-200">
+      <nav className="pt-4 px-3 shadow-lg shadow-gray-200 fixed top-0 w-full z-30 bg-white">
         <div className="flex gap-5 justify-between items-center">
           <div className="flex items-center gap-1">
             <button>

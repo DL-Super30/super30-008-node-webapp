@@ -55,9 +55,10 @@ export default function Login() {
       newErrors.password = "Password must contain at least one lowercase letter";
     } else if (!/[0-9]/.test(password)) {
       newErrors.password = "Password must contain at least one digit";
-    } else if (!/[\W_]/.test(password)) {
-      newErrors.password = "Password must contain at least one special character";
-    }
+    } 
+    // else if (!/[\W_]/.test(password)) {
+    //   newErrors.password = "Password must contain at least one special character";
+    // }
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -77,7 +78,7 @@ export default function Login() {
         localStorage.removeItem("password");
       }
 //  alert("form submitted successfully");
- dispatch(loginUserApi({name: userName, password}));
+ dispatch(loginUserApi({username: userName, password}));
 //router.push('/dashboard')
     }
   }; 
