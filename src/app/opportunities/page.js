@@ -4,11 +4,11 @@ import DataList from "@/components/dataList";
 
 
 
-export default function Oppurtunities() {
+export default function Opportunities() {
   return (
     <div>
       
-      <DataList type="oppurtunities" />
+      <DataList type="opportunities" />
     
     </div>
   );

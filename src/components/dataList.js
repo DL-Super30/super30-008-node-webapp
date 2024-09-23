@@ -8,6 +8,7 @@ import { useRouter } from 'next/navigation'
 import { useDispatch, useSelector } from "react-redux";
 import { createLeadsApi, getLeadsApi } from "@/slices/leadsSlice";
 import { format, subDays, startOfWeek, startOfMonth, endOfWeek, endOfMonth } from 'date-fns';
+import { createOpportunityApi, getOpportunityApi } from "@/slices/opportunitiesSlice";
 
 
 const DataList = ({ type, items }) => {
@@ -40,8 +41,8 @@ const DataList = ({ type, items }) => {
   useEffect(() => {
     if (type === 'leads') {
       dispatch(getLeadsApi());
-    } else if (type === 'oppurtunities') {
-      
+    } else if (type === 'opportunities') {
+      dispatch(getOpportunityApi());
     }
   }, []);
 
@@ -135,6 +136,7 @@ useEffect(() => {
 
   const addNewItem = (newItem) => {
     // initialData[type]= [...initialData[type], newItem];
+    if(type === 'leads'){
     const itemToBeAdded = {
         leadname: newItem.name,
         phone: newItem.phone,
@@ -146,13 +148,32 @@ useEffect(() => {
         course: newItem.course,
         selectedClassMode: newItem.classMode
     }
+
+
     dispatch(createLeadsApi(itemToBeAdded));
+  }
+  else if(type === 'opportunities') {
+    const itemToBeAdded = {
+      leadname: newItem.name,
+      phone: newItem.phone,
+      email: newItem.email,
+      feeQuoted: newItem.fee,
+      batchTiming: newItem.time,
+      leadStatus: newItem.leadStatus,
+      leadSource: newItem.leadSource,
+      course: newItem.course,
+      selectedClassMode: newItem.classMode
+  }
+ 
+    dispatch(createOpportunityApi(itemToBeAdded));
+  }
+
   };
 
   const getName = (item) => {
     if (type === 'leads') {
       return item.leadname;
-    } else if (type === 'oppurtunities') {
+    } else if (type === 'opportunities') {
       return ImageError.opportunityname;
     }
   }

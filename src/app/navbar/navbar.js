@@ -88,13 +88,13 @@ dispatch(logout());
                 <button>
                   <Link
                     className={`text-black flex items-center hover:text-black ${
-                      pathname === "/oppurtunities"
+                      pathname === "/opportunities"
                         ? "text-black border border-white border-b-orange-500 border-b-4 bg-red-100 p-2"
                         : ""
                     }`}
-                    href="/oppurtunities"
+                    href="/opportunities"
                   >
-                    Oppurtunities
+                    opportunities
                     <FaChevronDown className="ml-1 text-xs items-center font-thin" />
                   </Link>
                 </button>

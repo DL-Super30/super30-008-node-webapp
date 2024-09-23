@@ -451,7 +451,7 @@ const DetailPage = () => {
         </>
       )}
 
-      {type === "oppurtunities" && (
+      {type === "opportunities" && (
         <>
           <div className="pt-3 px-3 shadow-lg shadow-gray-200 fixed w-full h-28 bg-white z-10 items-center">
             <div className="flex justify-between mx-2 border-b-2 pb-1">

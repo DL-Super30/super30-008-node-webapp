@@ -4,7 +4,7 @@ import { useState } from "react";
 
 export default function Modal({ isOpen, onClose, type, addNewItem }) {
   const [leadsData, setLeadsData] = useState({
-    id: Math.random(),
+    
     name: "",
     leadStatus:"",
     cc:"",
@@ -21,33 +21,30 @@ export default function Modal({ isOpen, onClose, type, addNewItem }) {
    
   });
 
-  const [oppurtunitiesData, setOppurtunitiesData] = useState({
-    id: Math.random(),
+  const [opportunitiesData, setOpportunitiesData] = useState({
+  
     name: "",
     phone: "",
     stack: "",
     course: "",
-    createdOn: "",
-    createdOn: (new Date()).toDateString()
+  
   });
 
   const [learnersData, setLearnersData] = useState({
-    id: Math.random(),
+    
     name: "",
     phone: "",
     stack: "",
     course: "",
-    createdOn: "",
-    createdOn: (new Date()).toDateString()
+   
   });
 
   const [coursesData, setCoursesData] = useState({
-    id: Math.random(),
+    
     course: "",
     description: "",
     courseFee: "",
-    createdOn: "",
-    createdOn: (new Date()).toDateString()
+   
   });
 
   const handleSubmit = (e) => {
@@ -56,8 +53,8 @@ export default function Modal({ isOpen, onClose, type, addNewItem }) {
     
     if (type === "leads") {
       newItem = { ...leadsData};
-    } else if (type === "oppurtunities") {
-      newItem = { ...oppurtunitiesData };
+    } else if (type === "opportunities") {
+      newItem = { ...opportunitiesData };
     } else if (type === "learners") {
       newItem = { ...learnersData };
     } else if (type === "courses") {
@@ -76,7 +73,7 @@ export default function Modal({ isOpen, onClose, type, addNewItem }) {
     if (type === "leads") {
       setLeadsData({ ...leadsData, [name]: value });
     } else if (type === "opportunities") {
-      setOppurtunitiesData({ ...oppurtunitiesData, [name]: value });
+      setOpportunitiesData({ ...opportunitiesData, [name]: value });
     } else if (type === "learners") {
       setLearnersData({ ...learnersData, [name]: value });
     } else if (type === "courses") {
@@ -291,7 +288,7 @@ console.log('yes');
           )}
 
           {/* Form Fields for Opportunities */}
-          {type === "oppurtunities" && (
+          {type === "opportunities" && (
             <>
               <div className="mb-4">
                 <label className="block text-sm font-medium">
@@ -301,7 +298,7 @@ console.log('yes');
                   type="text"
                   className="w-full border border-gray-300 p-2 rounded"
                   placeholder="Enter opportunity name"
-                  value={oppurtunitiesData.name}
+                  value={opportunitiesData.name}
                 onChange={handleChange}
                 required
                 />
@@ -311,7 +308,7 @@ console.log('yes');
                 <textarea
                   className="w-full border border-gray-300 p-2 rounded"
                   placeholder="Enter description"
-                  value={oppurtunitiesData.name}
+                  value={opportunitiesData.name}
                 onChange={handleChange}
                 required
                 ></textarea>
@@ -324,7 +321,7 @@ console.log('yes');
                   type="number"
                   className="w-full border border-gray-300 p-2 rounded"
                   placeholder="Enter value"
-                  value={oppurtunitiesData.name}
+                  value={opportunitiesData.name}
                 onChange={handleChange}
                 required
                 />
