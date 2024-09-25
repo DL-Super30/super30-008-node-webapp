@@ -4,7 +4,7 @@ import axios from 'axios';
 
 export const getOpportunityApi = createAsyncThunk('getOpportunityApi', async () => {
     try {
-        const response = await axios.get('http://localhost:4000//api/opportunity');
+        const response = await axios.get('http://localhost:4000/api/opportunity');
         return response;
     } catch(error) {
         if (error.response) {
@@ -17,7 +17,7 @@ export const getOpportunityApi = createAsyncThunk('getOpportunityApi', async () 
 
 export const createOpportunityApi = createAsyncThunk('createOpportunityApi', async (payload) => {
     try {
-        const response = await axios.post('http://localhost:4000//api/opportunity', payload);
+        const response = await axios.post('http://localhost:4000/api/opportunity', payload);
         return response;
     } catch(error) {
         if (error.response) {
@@ -30,7 +30,7 @@ export const createOpportunityApi = createAsyncThunk('createOpportunityApi', asy
 
 export const updateOpportunityApi = createAsyncThunk('updateOpportunityApi', async (payload) => {
     try {
-        const response = await axios.put('http://localhost:4000//api/opportunity/' + payload.id, payload.itemInfo);
+        const response = await axios.put('http://localhost:4000/api/opportunity/' + payload.id, payload.itemInfo);
         return response;
     } catch(error) {
         if (error.response) {
@@ -42,7 +42,7 @@ export const updateOpportunityApi = createAsyncThunk('updateOpportunityApi', asy
 });
 
 const getInitialOpportunitiesState = () => {
-    return { isLoading: false, error: null, opportunities: [] };
+    return { isLoading: false, error: null, opportunities: [], newItem: {} };
   };
 
 const opportunitiesSlice = createSlice({
@@ -63,6 +63,15 @@ const opportunitiesSlice = createSlice({
             })
             .addCase(getOpportunityApi.rejected, (state, action) => {
                 return { opportunities: [], isLoading: false, error: action.payload };
+            })
+
+            .addCase(createOpportunityApi.fulfilled, (state, action) => {
+                if (action.payload.status === 200 || action.payload.status === 201) {
+
+                    return {...state, newItem: action.payload.data.data};
+                } else {
+                    return { ...state, error: action.payload, };
+                }
             })
     }
 

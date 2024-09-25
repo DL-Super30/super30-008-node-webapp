@@ -42,7 +42,7 @@ export const updateLeadsApi = createAsyncThunk('updateLeadsApi', async (payload)
 });
 
 const getInitialLeadsState = () => {
-    return { isLoading: false, error: null, leads: [] };
+    return { isLoading: false, error: null, leads: [], newItem: {} };
   };
 
 const leadsSlice = createSlice({
@@ -64,7 +64,18 @@ const leadsSlice = createSlice({
             .addCase(getLeadsApi.rejected, (state, action) => {
                 return { leads: [], isLoading: false, error: action.payload };
             })
+
+            .addCase(createLeadsApi.fulfilled, (state, action) => {
+                if (action.payload.status === 200 || action.payload.status === 201) {
+
+                    return {...state,newItem: action.payload.data.data};
+                } else {
+                    return { ...state, error: action.payload, };
+                }
+            })
+            
     }
+
 
 
 });
