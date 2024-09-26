@@ -1,115 +1,156 @@
-"use client";
-import { useState } from "react";
-import axios from "axios";
+'use client'
+
+import { useState } from "react"
+import axios from "axios"
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 export default function CreateLeadModal({ isOpen, onClose, onSuccess }) {
-  const [successMessage, setSuccessMessage] = useState(""); // Add success message state
+  const [successMessage, setSuccessMessage] = useState("")
   const [lead, setLead] = useState({
-    name: "",
-    countryCode: "",
-    phone: "",
+    leadname: "",
     email: "",
-    leadStatus: "",
-    leadSource: "",
-    stack: "",
-    course: "",
+    phone: "",
     feeQuoted: "",
     batchTiming: "",
-    classMode: "",
-    nextFollowUp: "",
-    description: "",
-    createdAt: new Date().toISOString(),
-  });
-  const [error, setError] = useState("");
+    leadStatus: "",
+    leadSource: "",
+    course: "",
+    selectedClassMode: ""
+  })
+  const [error, setError] = useState("")
   const [dropdowns, setDropdowns] = useState({
-    countryCode: false,
     leadStatus: false,
     leadSource: false,
-    stack: false,
     course: false,
     batchTiming: false,
-    classMode: false,
-  });
+    selectedClassMode: false,
+  })
 
   const handleChange = (e) => {
-    const { name, value } = e.target;
-    setLead((prev) => ({ ...prev, [name]: value }));
-  };
+    const { name, value } = e.target
+    setLead((prev) => ({ ...prev, [name]: name === "feeQuoted" ? Number(value) : value }))
+  }
 
   const handleDropdownToggle = (dropdown) => {
-    setDropdowns((prev) => ({ ...prev, [dropdown]: !prev[dropdown] }));
-  };
+    setDropdowns((prev) => ({ ...prev, [dropdown]: !prev[dropdown] }))
+  }
 
   const handleDropdownSelect = (dropdown, value) => {
-    setLead((prev) => ({ ...prev, [dropdown]: value }));
-    setDropdowns((prev) => ({ ...prev, [dropdown]: false }));
-  };
+    setLead((prev) => ({ ...prev, [dropdown]: value }))
+    setDropdowns((prev) => ({ ...prev, [dropdown]: false }))
+  }
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    try {
-      await axios.post("http://localhost:5000/save-data", lead);
-      setSuccessMessage("Lead saved successfully!"); // Set success message
-      setError(""); // Clear error message if any
-      onSuccess();
-
-      // Optionally refresh the page after a delay to show the updated data
-      setTimeout(() => {
-        window.location.reload(); // Refresh the page after 3 seconds
-      }, 3000);
-    } catch (err) {
-      setError("Failed to save the lead");
+    e.preventDefault()
+    if (!lead.leadStatus) {
+      setError("Lead Status is required");
+      toast.warn('Lead Status is required!', {
+        position: "top-center",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "colored",
+      });
+      return; // Prevent form submission if validation fails
     }
-  };
+    try {
+      await axios.post("http://localhost:4000/api/leads", lead)
+      setSuccessMessage("Lead saved successfully!")
+      setError("")
+      onSuccess()
+      toast.success('Lead Created Successfully!', {
+        position: "top-center",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "colored",
+        // transition: Bounce,
+      });
+
+      setTimeout(() => {
+        window.location.reload()
+      }, 2000)
+    } catch (error) {
+      if (error.response && error.response.data.error.name === 'SequelizeUniqueConstraintError') {
+        const emailError = error.response.data.error.errors.find(err => err.path === 'email');
+        if (emailError) {
+          // Display email already exists message
+          setError('Email already exists. Please use a different one.');
+          toast.error('Email already exists.', {
+            position: "top-center",
+            autoClose: 5000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: "colored",
+            // transition: Bounce,
+          });
+        }
+      } else {
+        // Handle other types of errors (optional)
+        setError("Failed to save the lead")
+        toast.warn('Failed to save the lead!', {
+          position: "top-center",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "colored",
+          // transition: Bounce,
+        });
+      }
+    }
+  }
+
+  const handleKeyDown = (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault()
+      handleSubmit(e)
+    }
+  }
 
   const generateBatchTimingOptions = () => {
-    const options = [];
+    const options = []
     for (let hour = 7; hour <= 21; hour++) {
-      options.push(`${hour}:00`);
+      options.push(`${hour}:00`)
     }
-    return options;
-  };
+    return options
+  }
 
-  return isOpen ? (
+  if (!isOpen) return null
+
+  return (
     <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50">
-
+      <ToastContainer />
       <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-5xl h-full sm:h-auto max-h-[90vh] overflow-y-auto relative">
         <h2 className="text-xl font-bold mb-4 text-teal-500">Create New Lead</h2>
         {successMessage && <p className="text-green-500">{successMessage}</p>}
         {error && <p className="text-red-500">{error}</p>}
 
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit} onKeyDown={handleKeyDown}>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 relative">
             <div className="relative">
               <label className="block text-gray-700">Name</label>
               <input
                 type="text"
-                name="name"
-                value={lead.name}
+                name="leadname"
+                value={lead.leadname}
                 onChange={handleChange}
                 className="border rounded-md w-full p-2 focus:outline-none focus:ring-1 focus:ring-gray-700"
                 required
               />
             </div>
-            <div className="relative">
-              <label className="block text-gray-700">Country Code</label>
-              <div
-                onClick={() => handleDropdownToggle("countryCode")}
-                className="cursor-pointer border-2 rounded-md w-full p-2 flex justify-between items-center hover:border-gray-700"
-              >
-                <span>{lead.countryCode || "Select Country Code"}</span>
-                <span className="material-icons">expand_more</span>
-              </div>
-              {dropdowns.countryCode && (
-                <div className="absolute z-10 border rounded-md mt-2 bg-white w-full max-h-40 overflow-y-auto">
-                  <div onClick={() => handleDropdownSelect("countryCode", "+49")} className="p-2 cursor-pointer hover:bg-gray-200">Germany (+49)</div>
-                  <div onClick={() => handleDropdownSelect("countryCode", "+1")} className="p-2 cursor-pointer hover:bg-gray-200">USA (+1)</div>
-                  <div onClick={() => handleDropdownSelect("countryCode", "+91")} className="p-2 cursor-pointer hover:bg-gray-200">India (+91)</div>
-                  <div onClick={() => handleDropdownSelect("countryCode", "+44")} className="p-2 cursor-pointer hover:bg-gray-200">UK (+44)</div>
-                </div>
-              )}
-            </div>
-
             <div className="relative">
               <label className="block text-gray-700">Phone</label>
               <input
@@ -133,13 +174,24 @@ export default function CreateLeadModal({ isOpen, onClose, onSuccess }) {
               />
             </div>
             <div className="relative">
+              <label className="block text-gray-700">Fee Quoted</label>
+              <input
+                type="text"
+                name="feeQuoted"
+                value={lead.feeQuoted}
+                onChange={handleChange}
+                className="border rounded-md w-full p-2 focus:outline-none focus:ring-1 focus:ring-gray-700"
+                required
+              />
+            </div>
+            <div className="relative">
               <label className="block text-gray-700">Lead Status</label>
               <div
                 onClick={() => handleDropdownToggle("leadStatus")}
                 className="cursor-pointer border-2 rounded-md w-full p-2 flex justify-between items-center hover:border-gray-700"
               >
                 <span>{lead.leadStatus || "Select Status"}</span>
-                <span className="material-icons"> expand_more</span>
+                <span className="material-icons">expand_more</span>
               </div>
               {dropdowns.leadStatus && (
                 <div className="absolute z-10 border rounded-md mt-2 bg-white w-full max-h-40 overflow-y-auto">
@@ -177,24 +229,6 @@ export default function CreateLeadModal({ isOpen, onClose, onSuccess }) {
               )}
             </div>
             <div className="relative">
-              <label className="block text-gray-700">Stack</label>
-
-              <div
-                onClick={() => handleDropdownToggle("stack")}
-                className="cursor-pointer border-2 rounded-md w-full p-2 flex justify-between items-center hover:border-gray-700"
-              >
-                <span>{lead.stack || "Select Stack"}</span>
-                <span className="material-icons">expand_more</span>
-              </div>
-              {dropdowns.stack && (
-                <div className="absolute z-10 border rounded-md mt-2 bg-white w-full max-h-40 overflow-y-auto">
-                  <div onClick={() => handleDropdownSelect("stack", "Life Skill")} className="p-2 cursor-pointer hover:bg-gray-200">Life Skill</div>
-                  <div onClick={() => handleDropdownSelect("stack", "Study Aboard")} className="p-2 cursor-pointer hover:bg-gray-200">Study Aboard</div>
-                  <div onClick={() => handleDropdownSelect("stack", "HR")} className="p-2 cursor-pointer hover:bg-gray-200">HR</div>
-                </div>
-              )}
-            </div>
-            <div className="relative">
               <label className="block text-gray-700">Course</label>
               <div
                 onClick={() => handleDropdownToggle("course")}
@@ -205,20 +239,18 @@ export default function CreateLeadModal({ isOpen, onClose, onSuccess }) {
               </div>
               {dropdowns.course && (
                 <div className="absolute z-10 border rounded-md mt-2 bg-white w-full max-h-40 overflow-y-auto">
-                  <div onClick={() => handleDropdownSelect("course", "HR Bussiness")} className="p-2 cursor-pointer hover:bg-gray-200">HR Bussiness</div>
+                  <div onClick={() => handleDropdownSelect("course", "HR Business")} className="p-2 cursor-pointer hover:bg-gray-200">HR Business</div>
                   <div onClick={() => handleDropdownSelect("course", "HR Generalist")} className="p-2 cursor-pointer hover:bg-gray-200">HR Generalist</div>
                   <div onClick={() => handleDropdownSelect("course", "HR Analytics")} className="p-2 cursor-pointer hover:bg-gray-200">HR Analytics</div>
                   <div onClick={() => handleDropdownSelect("course", "Spoken English")} className="p-2 cursor-pointer hover:bg-gray-200">Spoken English</div>
                   <div onClick={() => handleDropdownSelect("course", "Public Speaking")} className="p-2 cursor-pointer hover:bg-gray-200">Public Speaking</div>
                   <div onClick={() => handleDropdownSelect("course", "Communication Skills")} className="p-2 cursor-pointer hover:bg-gray-200">Communication Skills</div>
-
                   <div onClick={() => handleDropdownSelect("course", "Soft Skills")} className="p-2 cursor-pointer hover:bg-gray-200">Soft Skills</div>
                   <div onClick={() => handleDropdownSelect("course", "Aptitude")} className="p-2 cursor-pointer hover:bg-gray-200">Aptitude</div>
                   <div onClick={() => handleDropdownSelect("course", "IELTS")} className="p-2 cursor-pointer hover:bg-gray-200">IELTS</div>
-                  <div onClick={() => handleDropdownSelect("course", "TOFEL")} className="p-2 cursor-pointer hover:bg-gray-200">TOFEL</div>
+                  <div onClick={() => handleDropdownSelect("course", "TOEFL")} className="p-2 cursor-pointer hover:bg-gray-200">TOEFL</div>
                   <div onClick={() => handleDropdownSelect("course", "GRE")} className="p-2 cursor-pointer hover:bg-gray-200">GRE</div>
                   <div onClick={() => handleDropdownSelect("course", "JFS")} className="p-2 cursor-pointer hover:bg-gray-200">JFS</div>
-
                   <div onClick={() => handleDropdownSelect("course", "PFS")} className="p-2 cursor-pointer hover:bg-gray-200">PFS</div>
                   <div onClick={() => handleDropdownSelect("course", "MERN")} className="p-2 cursor-pointer hover:bg-gray-200">MERN</div>
                   <div onClick={() => handleDropdownSelect("course", "AWS+Devops")} className="p-2 cursor-pointer hover:bg-gray-200">AWS+Devops</div>
@@ -235,7 +267,7 @@ export default function CreateLeadModal({ isOpen, onClose, onSuccess }) {
                 className="cursor-pointer border-2 rounded-md w-full p-2 flex justify-between items-center hover:border-gray-700"
               >
                 <span>{lead.batchTiming || "Select Timing"}</span>
-                <span className="material-icons">expand_more</span> {/* Material icon */}
+                <span className="material-icons">expand_more</span>
               </div>
               {dropdowns.batchTiming && (
                 <div className="absolute z-10 border rounded-md mt-2 bg-white w-full max-h-40 overflow-y-auto">
@@ -251,43 +283,23 @@ export default function CreateLeadModal({ isOpen, onClose, onSuccess }) {
                 </div>
               )}
             </div>
-
             <div className="relative">
               <label className="block text-gray-700">Class Mode</label>
               <div
-                onClick={() => handleDropdownToggle("classMode")}
+                onClick={() => handleDropdownToggle("selectedClassMode")}
                 className="cursor-pointer border-2 rounded-md w-full p-2 flex justify-between items-center hover:border-gray-700"
               >
-                <span>{lead.classMode || "Select Class Mode"}</span>
+                <span>{lead.selectedClassMode || "Select Class Mode"}</span>
                 <span className="material-icons">expand_more</span>
               </div>
-              {dropdowns.classMode && (
+              {dropdowns.selectedClassMode && (
                 <div className="absolute z-10 border rounded-md mt-2 bg-white w-full max-h-40 overflow-y-auto">
-                  <div onClick={() => handleDropdownSelect("classMode", "Online")} className="p-2 cursor-pointer hover:bg-gray-200">International Online</div>
-                  <div onClick={() => handleDropdownSelect("classMode", "India Online")} className="p-2 cursor-pointer hover:bg-gray-200">India Online</div>
-                  <div onClick={() => handleDropdownSelect("classMode", "BLR Classroom")} className="p-2 cursor-pointer hover:bg-gray-200">BLR Classroom</div>
-                  <div onClick={() => handleDropdownSelect("classMode", "Hyd Classroom")} className="p-2 cursor-pointer hover:bg-gray-200">Hyd Classroom</div>
+                  <div onClick={() => handleDropdownSelect("selectedClassMode", "Online")} className="p-2 cursor-pointer hover:bg-gray-200">International Online</div>
+                  <div onClick={() => handleDropdownSelect("selectedClassMode", "India Online")} className="p-2 cursor-pointer hover:bg-gray-200">India Online</div>
+                  <div onClick={() => handleDropdownSelect("selectedClassMode", "BLR Classroom")} className="p-2 cursor-pointer hover:bg-gray-200">BLR Classroom</div>
+                  <div onClick={() => handleDropdownSelect("selectedClassMode", "Hyd Classroom")} className="p-2 cursor-pointer hover:bg-gray-200">Hyd Classroom</div>
                 </div>
               )}
-            </div>
-            <div>
-              <label className="block text-gray-700">Next Follow-Up</label>
-              <input
-                type="datetime-local"
-                name="nextFollowUp"
-                value={lead.nextFollowUp}
-                onChange={handleChange}
-                className="border rounded-md w-full p-2 focus:outline-none focus:ring-1 focus:ring-gray-700"
-              />
-            </div>
-            <div>
-              <label className="block text-gray-700">Description</label>
-              <textarea
-                name="description"
-                value={lead.description}
-                onChange={handleChange}
-                className="border rounded-md w-full p-2 focus:outline-none focus:ring-1 focus:ring-gray-700"
-              />
             </div>
           </div>
 
@@ -309,5 +321,5 @@ export default function CreateLeadModal({ isOpen, onClose, onSuccess }) {
         </form>
       </div>
     </div>
-  ) : null;
+  )
 }

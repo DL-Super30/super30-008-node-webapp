@@ -2,6 +2,8 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 import { useRouter } from "next/navigation";
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 export default function Home() {
   const [username, setUsername] = useState("");
@@ -31,38 +33,57 @@ export default function Home() {
     e.preventDefault();
     setErrorMessage("");
     setLoading(true);
-
+  
     try {
-      // Send a POST request to the login API
-      const response = await axios.post("http://localhost:5000/login", {
+      const response = await axios.post("http://localhost:4000/api/users/login", {
         username,
         password,
       });
-
-      if (response.data.success) {
+  
+      console.log(response); // Log the entire response for debugging
+  
+      // Check if the response contains a valid token
+      if (response.data.token) {
         const token = response.data.token;
-
-        // Store the token based on the "Remember Me" option
+  
         if (rememberMe) {
           localStorage.setItem("token", token);
+          
         } else {
           sessionStorage.setItem("token", token);
         }
-
-        alert("Login successful!");
-        router.push('/dashboard');
+  
+        toast.success('Login successful!', {
+          position: "top-center",
+          autoClose: 1000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "colored",
+          // transition: Bounce,
+          });
+          
+          setTimeout(() => {
+            router.push("/dashboard");
+          }, 2000)
       } else {
         setErrorMessage("Invalid username or password.");
       }
     } catch (error) {
       setErrorMessage("An error occurred during login. Please try again.");
+      console.log(error);  // Log error for better debugging
     } finally {
       setLoading(false);
     }
   };
+  
+  
 
   return (
     <div className="min-h-screen flex">
+      <ToastContainer/>
       {/* Left Section */}
       <div className="w-full md:w-1/2 flex flex-col justify-center items-center">
         <div className="mb-10">

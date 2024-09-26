@@ -35,21 +35,18 @@ export default function Navbar() {
 
   const getLinkClass = (path) => {
     return pathname === path
-      ? "py-2 px-4 font-bold bg-red-200 text-black border-b-4 border-b-red-500" // Lighter background and black text with red bottom border
-      : "py-2 px-4 hover:bg-gray-100 text-gray-700 border-b-4 border-b-transparent hover:border-b-red-500"; // Gray bottom border initially, red on hover
+      ? "py-2 px-4 font-bold bg-teal-100 text-black border-b-4 border-b-teal-500" // Lighter background and black text with red bottom border
+      : "py-2 px-4 hover:bg-gray-100 text-gray-700 border-b-4 border-b-transparent hover:border-b-teal-500"; // Gray bottom border initially, red on hover
   };
-  
-  
-  
 
   return (
-    <nav className="sticky top-0 p-2 flex flex-col md:flex-row items-center justify-between shadow-md bg-white z-50">
+    <nav className="sticky top-0 p-2 flex flex-col lg:flex-row items-center justify-between shadow-md bg-white z-50">
       {/* Logo and Hamburger Icon for mobile */}
-      <div className="flex items-center justify-between w-full md:w-auto">
+      <div className="flex items-center justify-between w-full lg:w-auto">
         <div className="text-xl font-bold pl-8">
           <Link href="/dashboard">
             <img
-              className="h-10 md:h-8" 
+              className="h-10 lg:h-8"
               src="https://www.skillcapital.ai/images/logo.png"
               alt="Logo"
             />
@@ -57,14 +54,14 @@ export default function Navbar() {
         </div>
         <button
           onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-          className="md:hidden text-2xl ml-4"
+          className="lg:hidden text-2xl ml-4"
         >
           {mobileMenuOpen ? <FaTimes /> : <FaBars />}
         </button>
       </div>
 
       {/* Navigation Links for larger screens */}
-      <div className="hidden md:flex md:space-x-3 flex-grow justify-center">
+      <div className={`lg:flex lg:space-x-3 flex-grow justify-center ${mobileMenuOpen ? 'block' : 'hidden'} lg:block`}>
         <Link href="/dashboard" className={getLinkClass("/dashboard")}>
           Home
         </Link>
@@ -89,7 +86,7 @@ export default function Navbar() {
       </div>
 
       {/* Right-side icons for larger screens */}
-      <div className="hidden md:flex items-center space-x-4 ml-auto">
+      <div className="hidden lg:flex items-center space-x-4 ml-auto">
         {/* Notification Icon */}
         <div className="relative">
           <FaBell
@@ -122,7 +119,7 @@ export default function Navbar() {
                 <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">
                   Profile Settings
                 </li>
-                <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer" onClick = {confirmLogout}>
+                <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer" onClick={confirmLogout}>
                   Logout
                 </li>
               </ul>
@@ -133,7 +130,7 @@ export default function Navbar() {
 
       {/* Mobile Menu */}
       <div
-        className={`md:hidden ${mobileMenuOpen ? 'block' : 'hidden'} w-full mt-4`}
+        className={`lg:hidden ${mobileMenuOpen ? 'block' : 'hidden'} w-full mt-4`}
       >
         <div className="flex flex-col items-center">
           <Link href="/dashboard" className={getLinkClass("/dashboard")}>
@@ -190,7 +187,7 @@ export default function Navbar() {
                     <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">
                       Profile Settings
                     </li>
-                    <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer">
+                    <li className="px-4 py-2 hover:bg-gray-100 cursor-pointer" onClick={confirmLogout}>
                       Logout
                     </li>
                   </ul>
@@ -200,28 +197,7 @@ export default function Navbar() {
           </div>
         </div>
       </div>
-      {showLogoutModal && (
-        <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-20">
-          <div className="bg-white p-6 rounded-lg shadow-lg w-80">
-            <h2 className="text-xl font-bold mb-4">Confirm Logout</h2>
-            <p className="mb-4">Are you sure you want to logout?</p>
-            <div className="flex justify-end space-x-4">
-              <button
-                className="bg-red-500 text-white py-2 px-4 rounded hover:bg-red-700"
-                onClick={handleLogout} // Perform logout
-              >
-                Logout
-              </button>
-              <button
-                className="bg-gray-300 text-gray-700 py-2 px-4 rounded hover:bg-gray-400"
-                onClick={() => setShowLogoutModal(false)} // Cancel logout
-              >
-                Cancel
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
     </nav>
+
   );
 }
