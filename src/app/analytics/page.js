@@ -1,7 +1,7 @@
 "use client";
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
-function analytics(){
+function Analytics(){
     const router = useRouter();
 
   useEffect(() => {
@@ -17,4 +17,4 @@ function analytics(){
         <div>analytics</div>
     )
 }
-export default analytics;
+export default Analytics;

@@ -57,8 +57,9 @@ export default function CreateLeadModal({ isOpen, onClose, onSuccess }) {
       });
       return; // Prevent form submission if validation fails
     }
+    const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
     try {
-      await axios.post("http://localhost:4000/api/leads", lead)
+      await axios.post(`${API_BASE_URL}/leads`, lead)
       setSuccessMessage("Lead saved successfully!")
       setError("")
       onSuccess()

@@ -77,12 +77,12 @@ export default function UpdateModal() {
   const handleClose = () => {
     dispatch(closeModal())
   }
-
+  const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
   const handleSubmit = async (e) => {
     e.preventDefault()
 
     try {
-      const response = await axios.put(`http://localhost:4000/api/opportunity/${selectedLead.id}`, leadData)
+      const response = await axios.put(`${API_BASE_URL}/opportunity/${selectedLead.id}`, leadData)
 
       if (response.status === 200) {
         setSuccessMessage("Opportunity updated successfully!")

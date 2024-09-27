@@ -24,11 +24,12 @@ function Dashboard() {
       router.push('/');
     }
   }, [router]);
+  const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
   useEffect(() => {
     const fetchLeadsData = async () => {
       try {
-        const response = await fetch('http://localhost:4000/api/leadstatus/todayLeadsOnHourly');
+        const response = await fetch(`${API_BASE_URL}/leadstatus/todayLeadsOnHourly`);
         const result = await response.json();
         const leads = result.data;
 
@@ -36,7 +37,7 @@ function Dashboard() {
         const processedLeadsByHour = processLeadsByHour(leads);
 
         // Fetch lead status data
-        const statusResponse = await fetch('http://localhost:4000/api/leadstatus/getleadStatus');
+        const statusResponse = await fetch(`${API_BASE_URL}/leadstatus/getleadStatus`);
         const statusResult = await statusResponse.json();
         const { processedLeadsByStatus, total } = processLeadsByStatus(statusResult.data);
 

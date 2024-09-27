@@ -1,7 +1,7 @@
 "use client";
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
-function courses(){
+function Courses(){
     const router = useRouter();
 
   useEffect(() => {
@@ -16,4 +16,4 @@ function courses(){
         <div>courses</div>
     )
 }
-export default courses;
+export default Courses;

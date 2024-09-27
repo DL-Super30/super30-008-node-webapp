@@ -10,6 +10,7 @@ import LeadDeleteModal from '../components/deleteModal';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import ConvertModal from "../components/convertModal";
+import Image from "next/image";
 
 export default function Leads() {
   const [view, setView] = useState("table");
@@ -41,12 +42,13 @@ export default function Leads() {
   useEffect(() => {
     fetchLeads();
   }, []);
+  const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
   const fetchLeads = async () => {
     setLoading(true);
     setError(null);
     try {
-      const response = await axios.get(`http://localhost:4000/api/leads`);
+      const response = await axios.get(`${API_BASE_URL}/leads`);
       if (response.data && Array.isArray(response.data.data)) {
         setAllLeads(response.data.data);
       } else {
@@ -131,15 +133,15 @@ export default function Leads() {
     setLoading(true);
     try {
       for (const leadId of selectedLeads) {
-        const response = await fetch(`http://localhost:4000/api/leads/${leadId}/convert`, {
+        const response = await fetch(`${API_BASE_URL}/leads/${leadId}/convert`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
           },
         });
-  
+
         const data = await response.json();
-  
+
         if (!response.ok) {
           if (data.status === "Error" && data.message === "An error occurred while converting the lead to an opportunity" && data.error === "Validation error") {
             throw new Error("Email already exists");
@@ -147,10 +149,10 @@ export default function Leads() {
             throw new Error(`Failed to convert lead ${leadId}`);
           }
         }
-  
+
         console.log(`Lead ${leadId} converted successfully:`, data);
       }
-  
+
       // After all conversions are done
       setLoading(false);
       setModalOpen(false);
@@ -164,17 +166,17 @@ export default function Leads() {
         progress: undefined,
         theme: "colored",
       });
-  
+
       // Refresh the leads list
       fetchLeads();
-  
+
       // Clear selected leads
       setSelectedLeads([]);
-  
+
     } catch (error) {
       console.error('Error converting leads:', error);
       setLoading(false);
-      
+
       if (error.message === "Email already exists") {
         toast.error('Failed to convert lead. Email already exists in opportunities.', {
           position: "top-center",
@@ -259,7 +261,7 @@ export default function Leads() {
   const handleDeleteConfirm = async () => {
     try {
       for (const leadId of selectedLeads) {
-        await axios.delete(`http://localhost:4000/api/leads/${leadId}`);
+        await axios.delete(`${API_BASE_URL}/leads/${leadId}`);
       }
       fetchLeads();
       setSelectedLeads([]);
@@ -349,8 +351,8 @@ export default function Leads() {
           {isMyLeadsDropdownOpen && (
             <ul className="absolute top-full mt-1 bg-white shadow-lg rounded-lg z-40 w-full sm:w-auto">
               <li className="px-4 py-2 hover:bg-teal-200 cursor-pointer" onClick={() => handleFilterChange("All Leads")}>All Leads</li>
-              <li className="px-4 py-2 hover:bg-teal-200 cursor-pointer" onClick={() => handleFilterChange("Today's Leads")}>Today's Leads</li>
-              <li className="px-4 py-2 hover:bg-teal-200 cursor-pointer" onClick={() => handleFilterChange("Yesterday's Leads")}>Yesterday's Leads</li>
+              <li className="px-4 py-2 hover:bg-teal-200 cursor-pointer" onClick={() => handleFilterChange("Today's Leads")}>Today&apos;s Leads</li>
+              <li className="px-4 py-2 hover:bg-teal-200 cursor-pointer" onClick={() => handleFilterChange("Yesterday's Leads")}>Yesterday&apos;s Leads</li>
               <li className="px-4 py-2 hover:bg-teal-200 cursor-pointer" onClick={() => handleFilterChange("Previous Leads")}>Previous Leads</li>
             </ul>
           )}
@@ -440,7 +442,16 @@ export default function Leads() {
                 <tr>
                   <td colSpan="8" className="p-4">
                     <div className="flex flex-col items-center justify-center text-red-700 rounded-lg p-5 max-w-sm mx-auto ">
-                      <img src="./images/error.png" alt="Error" className="w-auto h-auto mb-4" />
+                      <div className="relative w-full h-64 mb-4"> {/* Adjust h-64 to your desired height */}
+                        <Image
+                          src="/images/error.png"
+                          alt="Error"
+                          width={0}
+                          height={0}
+                          layout="fill" // This makes the image cover the parent container
+                          className="object-contain" // Maintains aspect ratio
+                        />
+                      </div>
                       <p className="text-lg font-bold text-center">{error}</p>
                     </div>
                   </td>
@@ -454,8 +465,15 @@ export default function Leads() {
               ) : (paginatedLeads.length === 0 && (!error)) ? (
                 <tr>
                   <td colSpan="8" className="text-center py-4 text-gray-500">
-                    <div className="flex flex-col items-center justify-center text-yellow-500 rounded-lg p-5 max-w-sm mx-auto ">
-                      <img src="./images/noData.png" alt="Error" className="w-auto h-auto mb-4" />
+                    <div className="flex flex-col items-center justify-center text-yellow-500 rounded-lg p-5 max-w-sm mx-auto">
+                      <Image
+                        src="/images/noData.png"
+                        alt="No data found"
+                        width={0}
+                        height={0}
+                        layout="responsive" // Use layout here
+                        className="w-full h-auto mb-4" // Use Tailwind CSS classes for width and height
+                      />
                       <p className="text-lg font-bold text-center">No data found</p>
                     </div>
                   </td>

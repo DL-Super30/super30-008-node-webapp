@@ -2,7 +2,7 @@
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 
-function activities(){
+function Activities(){
     const router = useRouter();
 
   useEffect(() => {
@@ -17,4 +17,4 @@ function activities(){
         <div>Hello</div>
     )
 }
-export default activities;
+export default Activities;

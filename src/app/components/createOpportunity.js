@@ -73,8 +73,9 @@ export default function CreateOpportunityModal({ isOpen, onClose, onSuccess }) {
       })
       return
     }
+    const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
     try {
-      await axios.post("http://localhost:4000/api/opportunity", lead)
+      await axios.post(`${API_BASE_URL}/opportunity`, lead)
       setSuccessMessage("Opportunity created successfully!")
       setError("")
       onSuccess()
@@ -109,8 +110,8 @@ export default function CreateOpportunityModal({ isOpen, onClose, onSuccess }) {
           })
         }
       } else {
-        setError("Failed to save the opportunity")
-        toast.warn('Failed to save the opportunity!', {
+        setError("Please enter required fields")
+        toast.warn('Please enter required fields', {
           position: "top-center",
           autoClose: 5000,
           hideProgressBar: false,
@@ -159,7 +160,7 @@ export default function CreateOpportunityModal({ isOpen, onClose, onSuccess }) {
         <form onSubmit={handleSubmit} onKeyDown={handleKeyDown}>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 relative">
             <div className="relative">
-              <label className="block text-gray-700">Name</label>
+              <label className="block text-gray-700">Name<span className="text-red-500">*</span></label>
               <input
                 type="text"
                 name="name"
@@ -170,7 +171,7 @@ export default function CreateOpportunityModal({ isOpen, onClose, onSuccess }) {
               />
             </div>
             <div className="relative">
-              <label className="block text-gray-700">CC</label>
+              <label className="block text-gray-700">CC<span className="text-red-500">*</span></label>
               <input
                 type="text"
                 name="cc"
@@ -180,7 +181,7 @@ export default function CreateOpportunityModal({ isOpen, onClose, onSuccess }) {
               />
             </div>
             <div className="relative">
-              <label className="block text-gray-700">Phone</label>
+              <label className="block text-gray-700">Phone<span className="text-red-500">*</span></label>
               <input
                 type="text"
                 name="phone"
@@ -191,7 +192,7 @@ export default function CreateOpportunityModal({ isOpen, onClose, onSuccess }) {
               />
             </div>
             <div className="relative">
-              <label className="block text-gray-700">Email</label>
+              <label className="block text-gray-700">Email<span className="text-red-500">*</span></label>
               <input
                 type="email"
                 name="email"
@@ -202,7 +203,7 @@ export default function CreateOpportunityModal({ isOpen, onClose, onSuccess }) {
               />
             </div>
             <div className="relative">
-              <label className="block text-gray-700">Fee Quoted</label>
+              <label className="block text-gray-700">Fee Quoted<span className="text-red-500">*</span></label>
               <input
                 type="text"
                 name="feeQuoted"
@@ -236,7 +237,7 @@ export default function CreateOpportunityModal({ isOpen, onClose, onSuccess }) {
               )}
             </div>
             <div className="relative">
-              <label className="block text-gray-700">Lead Status</label>
+              <label className="block text-gray-700">Lead Status<span className="text-red-500">*</span></label>
               <div
                 onClick={() => handleDropdownToggle("leadStatus")}
                 className="cursor-pointer border-2 rounded-md w-full p-2 flex justify-between items-center hover:border-gray-700"
@@ -254,7 +255,7 @@ export default function CreateOpportunityModal({ isOpen, onClose, onSuccess }) {
               )}
             </div>
             <div className="relative">
-              <label className="block text-gray-700">Opportunity Status</label>
+              <label className="block text-gray-700">Opportunity Status<span className="text-red-500">*</span></label>
               <div
                 onClick={() => handleDropdownToggle("opportunityStatus")}
                 className="cursor-pointer border-2 rounded-md w-full p-2 flex justify-between items-center hover:border-gray-700"
@@ -394,7 +395,7 @@ export default function CreateOpportunityModal({ isOpen, onClose, onSuccess }) {
               )}
             </div>
             <div className="relative">
-              <label className="block text-gray-700">Next Follow Up</label>
+              <label className="block text-gray-700">Next Follow Up<span className="text-red-500">*</span></label>
               <input
                 type="datetime-local"
                 name="nextFollowUp"

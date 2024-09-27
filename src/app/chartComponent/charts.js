@@ -46,7 +46,7 @@ const Charts = ({ leadsByHour, leadsByStatus }) => {
     <div className="flex flex-col md:flex-row justify-around items-center w-full space-y-8 md:space-y-0 md:space-x-8 ">
       {/* Line Chart */}
       <div className="w-full md:w-1/2 bg-white p-6 rounded-lg shadow-md">
-        <h2 className="text-center text-xl font-bold mb-4">Today's Leads by Time</h2>
+        <h2 className="text-center text-xl font-bold mb-4">Today&apos;s Leads by Time</h2>
         <Line data={lineData} options={{
           scales: {
             x: {

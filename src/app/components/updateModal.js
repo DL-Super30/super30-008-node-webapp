@@ -78,6 +78,7 @@ export default function UpdateModal() {
   const handleClose = () => {
     dispatch(closeModal())
   }
+  const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
   // Handle form submission to update the lead
   const handleSubmit = async (e) => {
@@ -85,7 +86,7 @@ export default function UpdateModal() {
 
     try {
       // Make the API call to update the lead
-      const response = await axios.put(`http://localhost:4000/api/leads/${selectedLead.id}`, leadData)
+      const response = await axios.put(`${API_BASE_URL}/leads/${selectedLead.id}`, leadData)
 
       if (response.status === 200) {
         // Successfully updated the lead

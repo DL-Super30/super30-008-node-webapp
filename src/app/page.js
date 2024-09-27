@@ -4,6 +4,7 @@ import axios from "axios";
 import { useRouter } from "next/navigation";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import Image from 'next/image';
 
 export default function Home() {
   const [username, setUsername] = useState("");
@@ -27,32 +28,32 @@ export default function Home() {
       router.push('/dashboard');
     }
   }, [router]);
-
+  const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
   // Handle form submission and API login
   const handleSubmit = async (e) => {
     e.preventDefault();
     setErrorMessage("");
     setLoading(true);
-  
+
     try {
-      const response = await axios.post("http://localhost:4000/api/users/login", {
+      const response = await axios.post(`${API_BASE_URL}/users/login`, {
         username,
         password,
       });
-  
+
       console.log(response); // Log the entire response for debugging
-  
+
       // Check if the response contains a valid token
       if (response.data.token) {
         const token = response.data.token;
-  
+
         if (rememberMe) {
           localStorage.setItem("token", token);
-          
+
         } else {
           sessionStorage.setItem("token", token);
         }
-  
+
         toast.success('Login successful!', {
           position: "top-center",
           autoClose: 1000,
@@ -63,11 +64,11 @@ export default function Home() {
           progress: undefined,
           theme: "colored",
           // transition: Bounce,
-          });
-          
-          setTimeout(() => {
-            router.push("/dashboard");
-          }, 2000)
+        });
+
+        setTimeout(() => {
+          router.push("/dashboard");
+        }, 2000)
       } else {
         setErrorMessage("Invalid username or password.");
       }
@@ -78,19 +79,22 @@ export default function Home() {
       setLoading(false);
     }
   };
-  
-  
+
+
 
   return (
     <div className="min-h-screen flex">
-      <ToastContainer/>
+      <ToastContainer />
       {/* Left Section */}
       <div className="w-full md:w-1/2 flex flex-col justify-center items-center">
         <div className="mb-10">
-          <img
-            src="https://www.skillcapital.ai/images/logo.png"
+          <Image
+            src="/images/logo.png"
             alt="Company Logo"
-            className="h-18"
+            width={0}
+            height={0}
+            layout="responsive" // Use intrinsic layout for fixed dimensions based on natural size
+            className="h-18" // Apply Tailwind CSS class for height
           />
         </div>
 
@@ -165,7 +169,14 @@ export default function Home() {
           </p>
         </div>
         <div className="flex justify-center items-end">
-          <img src="/login-pic.png" alt="Welcome" className="h-auto w-auto" />
+          <Image
+            src="/login-pic.png" // Adjust the path if necessary
+            alt="Welcome"
+            width={0}
+            height={0}
+            layout="responsive" // Adjusts based on the image's intrinsic dimensions
+            className="h-auto w-auto" // Use Tailwind CSS classes for height and width
+          />
         </div>
       </div>
     </div>

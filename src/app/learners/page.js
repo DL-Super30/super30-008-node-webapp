@@ -1,7 +1,7 @@
 "use client";
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
-function learners(){
+function Learners(){
     const router = useRouter();
 
   useEffect(() => {
@@ -16,4 +16,4 @@ function learners(){
         <div>learners</div>
     )
 }
-export default learners;
+export default Learners;

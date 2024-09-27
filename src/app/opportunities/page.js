@@ -10,6 +10,7 @@ import LeadDeleteModal from '../components/deleteModal';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import UpdateModal from "../components/opportunityUpdate";
+import Image from 'next/image';
 
 export default function Opportunities() {
   const [view, setView] = useState("table");
@@ -41,12 +42,13 @@ export default function Opportunities() {
   useEffect(() => {
     fetchLeads();
   }, []);
+  const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
   const fetchLeads = async () => {
     setLoading(true);
     setError(null);
     try {
-      const response = await axios.get(`http://localhost:4000/api/opportunity`);
+      const response = await axios.get(`${API_BASE_URL}/opportunity`);
       if (response.data && Array.isArray(response.data.data)) {
         const sortedLeads = response.data.data.sort((a, b) => b.id - a.id);
         setAllLeads(sortedLeads);
@@ -161,7 +163,7 @@ export default function Opportunities() {
   const handleDeleteConfirm = async () => {
     try {
       for (const leadId of selectedLeads) {
-        await axios.delete(`http://localhost:4000/api/opportunity/${leadId}`);
+        await axios.delete(`${API_BASE_URL}/opportunity/${leadId}`);
       }
       fetchLeads();
       setSelectedLeads([]);
@@ -249,8 +251,8 @@ export default function Opportunities() {
           {isMyLeadsDropdownOpen && (
             <ul className="absolute top-full mt-1 bg-white shadow-lg rounded-lg z-40 w-full sm:w-auto">
               <li className="px-4 py-2 hover:bg-teal-200 cursor-pointer" onClick={() => handleFilterChange("All Opportunities")}>All Opportunities</li>
-              <li className="px-4 py-2 hover:bg-teal-200 cursor-pointer" onClick={() => handleFilterChange("Today's Opportunities")}>Today's Opportunities</li>
-              <li className="px-4 py-2 hover:bg-teal-200 cursor-pointer" onClick={() => handleFilterChange("Yesterday's Opportunities")}>Yesterday's Opportunities</li>
+              <li className="px-4 py-2 hover:bg-teal-200 cursor-pointer" onClick={() => handleFilterChange("Today's Opportunities")}>Today&apos;s Opportunities</li>
+              <li className="px-4 py-2 hover:bg-teal-200 cursor-pointer" onClick={() => handleFilterChange("Yesterday's Opportunities")}>Yesterday&apos;s Opportunities</li>
               <li className="px-4 py-2 hover:bg-teal-200 cursor-pointer" onClick={() => handleFilterChange("Previous Opportunities")}>Previous Opportunities</li>
             </ul>
           )}
@@ -338,8 +340,16 @@ export default function Opportunities() {
               {error && (
                 <tr>
                   <td colSpan="8" className="p-4">
-                    <div className="flex flex-col items-center justify-center text-red-700 rounded-lg p-5 max-w-sm mx-auto ">
-                      <img src="./images/error.png" alt="Error" className="w-auto h-auto mb-4" />
+                    <div className="flex flex-col items-center justify-center text-red-700 rounded-lg p-5 max-w-sm mx-auto">
+                      <Image
+                        src="/images/error.png"
+                        alt="Error"
+                        width={0}
+                        height={0}
+                        layout="responsive" // Use layout to make the image responsive
+                        className="mb-4" // Apply margin-bottom using Tailwind CSS
+                      // Note: You can use 'sizes' to control how the image is loaded based on screen size if needed.
+                      />
                       <p className="text-lg font-bold text-center">{error}</p>
                     </div>
                   </td>
@@ -353,8 +363,15 @@ export default function Opportunities() {
               ) : (paginatedLeads.length === 0 && (!error)) ? (
                 <tr>
                   <td colSpan="8" className="text-center py-4 text-gray-500">
-                    <div className="flex flex-col items-center justify-center text-yellow-500 rounded-lg p-5 max-w-sm mx-auto ">
-                      <img src="./images/noData.png" alt="Error" className="w-auto h-auto mb-4" />
+                    <div className="flex flex-col items-center justify-center text-yellow-500 rounded-lg p-5 max-w-sm mx-auto">
+                      <Image
+                        src="/images/noData.png"
+                        alt="No data found"
+                        width={0}
+                        height={0}
+                        layout="responsive" // Make the image responsive
+                        className="mb-4" // Apply margin-bottom using Tailwind CSS
+                      />
                       <p className="text-lg font-bold text-center">No data found</p>
                     </div>
                   </td>

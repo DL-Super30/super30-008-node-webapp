@@ -3,11 +3,12 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
 
 // Async thunk to update lead data
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 export const updateLead = createAsyncThunk(
   'leads/updateLead',
   async (updatedLead, { rejectWithValue }) => {
     try {
-      const response = await axios.post('http://localhost:4000/api/leads/', updatedLead);
+      const response = await axios.post(`${API_BASE_URL}/leads/`, updatedLead);
       return response.data;  // Returning the updated lead data
     } catch (error) {
       return rejectWithValue(error.response.data);
