@@ -5,28 +5,33 @@ import { useSelector } from "react-redux";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { FaChevronDown } from "react-icons/fa";
-import { useDispatch,} from "react-redux";
+import { useDispatch } from "react-redux";
 import { logout } from "@/slices/loginSlice";
-import { useEffect } from "react";
-import { useRouter } from 'next/navigation'
-
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 
 export default function Navbar() {
   const pathname = usePathname();
   const dispatch = useDispatch();
   const router = useRouter();
   const login = useSelector((state) => state.login);
+  const [isOpen, setIsOpen] = useState(false);
   // const login = useSelector((state) => state.login);
   // console.log(login);
   // if (!login?.isLoggedIn) return null;
 
-  const handleLogout = ()=> {
-dispatch(logout());
-  }
+  const toggleUserProfile = () => {
+    setIsOpen(!isOpen);
+  };
+
+  const handleLogout = () => {
+    dispatch(logout());
+  };
 
   useEffect(() => {
-    if(!login.isLoggedIn){
-    router.push('/login')}
+    if (!login.isLoggedIn) {
+      router.push("/login");
+    }
   }, [login.isLoggedIn]);
 
   return (
@@ -65,7 +70,7 @@ dispatch(logout());
                         ? "text-black border border-white border-b-orange-500 border-b-4 bg-red-100 p-2"
                         : ""
                     }`}
-                    href="/homepage"
+                    href="/dashboard"
                   >
                     Home
                   </Link>
@@ -175,17 +180,26 @@ dispatch(logout());
                     className="inline-block"
                   />
                 </div>
-                <div>
+
+                <div
+                  onClick={toggleUserProfile}
+                  className=""
+                >
                   <Image
                     src="/images/logout-icon.png"
                     alt="logout-icon-img"
                     width={30}
                     height={40}
                     className="inline-block"
-                    onClick={handleLogout}
-                
                   />
                 </div>
+
+                {isOpen && (
+                  <ul className="absolute z-10 bg-gray-100 border border-gray-300 rounded-md shadow-lg top-14 left-[77rem] w-28 cursor-pointer">
+                    <li className="border-b-2">Profile Settings</li>
+                    <li onClick={handleLogout}>Logout</li>
+                  </ul>
+                )}
               </div>
             </div>
           </div>

@@ -1,5 +1,5 @@
 "use client";
-import { Select } from "@nextui-org/react";
+import Image from "next/image";
 import React from "react";
 import { useState } from "react";
 
@@ -127,7 +127,17 @@ console.log('yes');
   return (
     <div className="fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center">
       <div className="bg-white p-5 rounded-md shadow-lg w-4/5 h-4/5 overflow-y-auto mt-8">
+      <div className="flex flex-row justify-between">
         <h2 className="text-xl font-bold mb-4">{`Create ${type}`}</h2>
+        <Image
+              src="/images/cancel-icon.jpg"
+              alt="cancel-icon"
+              width={20}
+              height={4}
+              className="w-4 h-4 cursor-pointer"
+              onClick={onClose}
+            />
+        </div>
         <form onSubmit={handleSubmit} className="grid grid-cols-2 gap-4 ">
           {/* Form Fields for Leads */}
           {type === "leads" && (
@@ -918,20 +928,10 @@ console.log('yes');
                 required
                 >
                   <option className="text-neutral-800"value="">Select Learner Stage</option>
-                  <option className="text-neutral-800"value="none">None</option>
-                <option className="text-neutral-800"value="advancedDiscussion">Advanced Discussion</option>
-                <option className="text-neutral-800"value="readyToJoin">Ready To Join</option>
-                <option className="text-neutral-800"value="callNotAnswered">Call Not Answered</option>
-                <option className="text-neutral-800"value="visiting">Visiting</option>
-                <option className="text-neutral-800"value="feesNegotiation">Fees Negotiation</option>
-                <option className="text-neutral-800"value="batchAllocation">Batch Allocation</option>
-                <option className="text-neutral-800"value="needTimeThisWeek">Need Time This Week</option>
-                <option className="text-neutral-800"value="needTimeNextWeek">Need Time Next Week</option>
-                <option className="text-neutral-800"value="needTimeThisMonth">Need Time This Month</option>
-                <option className="text-neutral-800"value="needTimeNextMonth">Need Time Next Month</option>
-                <option className="text-neutral-800"value="specialRequirements">Special Requirements</option>
-                <option className="text-neutral-800"value="closedWon">Closed Won (Registered)</option>
-                <option className="text-neutral-800"value="closedLost">Closed Lost (ColdLead)</option>
+                  <option className="text-neutral-800"value="upcoming">Upcoming</option>
+                  <option className="text-neutral-800"value="ongoing">Ongoing</option>
+                  <option className="text-neutral-800"value="onHold">On Hold</option>
+                  <option className="text-neutral-800"value="completed">Completed</option>
                 
                 </select>
               </div>
@@ -999,7 +999,7 @@ console.log('yes');
                   Preferable Time
                 </label>
                 <input
-                  type="date"
+                  type="time"
                   className="w-full border-b-2 border-gray-300 p-2 rounded text-base font-medium"
                   placeholder="Preferable Time"
                   value={learnersData.preferableTime}
@@ -1121,8 +1121,8 @@ console.log('yes');
                   type="text"
                   className="w-full border border-gray-300 p-2 rounded"
                   placeholder="Enter course name"
-                  name="course"
-                  value={coursesData.courseFee}
+                  name="courseName"
+                  value={coursesData.courseName}
                 onChange={handleChange}
                 required
                 />
@@ -1132,7 +1132,7 @@ console.log('yes');
                 <textarea
                   className="w-full border border-gray-300 p-2 rounded"
                   placeholder="Enter course description"
-                  value={coursesData.courseFee}
+                  value={coursesData.description}
                 onChange={handleChange}
                 required
                 ></textarea>
@@ -1155,14 +1155,14 @@ console.log('yes');
             <div className="flex justify-center gap-2">
               <button
                 type="button"
-                className="bg-gray-500 text-white px-4 py-2 rounded "
+                className="bg-gray-500 text-white px-4 py-2 rounded cursor-pointer "
                 onClick={onClose}
               >
                 Cancel
               </button>
               <button
                 type="submit"
-                className="bg-blue-500 text-white px-4 py-2 rounded "
+                className="bg-blue-500 text-white px-4 py-2 rounded cursor-pointer"
                 onClick={handleSubmit}
               >
                 Create

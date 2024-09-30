@@ -6,26 +6,72 @@ import Image from "next/image";
 import Modal from "@/app/modal/modal";
 import { useRouter } from "next/navigation";
 import { useDispatch, useSelector } from "react-redux";
-import { createLeadsApi, getLeadsApi } from "@/slices/leadsSlice";
-import {format, subDays, startOfWeek, startOfMonth, endOfWeek, endOfMonth} from "date-fns";
-import {createOpportunityApi, getOpportunityApi,} from "@/slices/opportunitiesSlice";
-import { createLearnerApi, getlearnerApi } from "@/slices/learnersSlice";
+import { createLeadsApi, deleteLeadsApi, getLeadsApi } from "@/slices/leadsSlice";
+import {
+  format,
+  subDays,
+  startOfWeek,
+  startOfMonth,
+  endOfWeek,
+  endOfMonth,
+} from "date-fns";
+import {
+  createOpportunityApi,
+  deleteOpportunityApi,
+  getOpportunityApi,
+} from "@/slices/opportunitiesSlice";
+import { createLearnerApi, deleteLearnerApi, getlearnerApi } from "@/slices/learnersSlice";
 
 const DataList = ({ type, items }) => {
-  const ITEMS_PER_PAGE = 15;
+  const ITEMS_PER_PAGE = 10;
   // const [dataList, setDataList] = useState(initialData[type] || []);
   const [searchQuery, setSearchQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [filteredDataList, setFilteredDataList] = useState([]);
+  const [currentDataList, setCurrentDataList] = useState([]);
   const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
   const [selectedOption, setSelectedOption] = useState(`My ${type}`);
-  const [selectedStatus, setSelectedStatus] = useState('');
-  const [tableDataView, setTableDataView] = useState({notContacted: 0, attempted: 0, warmLead: 0, coldLead: 0});
+  const [selectedStatus, setSelectedStatus] = useState("");
+  const [viewMode, setViewMode] = useState("table");
+  const [tableDataView, setTableDataView] = useState({
+    notContacted: 0,
+    attempted: 0,
+    warmLead: 0,
+    coldLead: 0,
+    visited: 0,
+    visiting:0,
+    demoAttended:0,
+    lostOpportunity:0,
+    upcoming: 0,
+    ongoing: 0,
+    onHold: 0,
+    completed: 0
+  });
+  const [kanbanDataView, setKanbanDataView] = useState({
+    notContacted: 0,
+    attempted: 0,
+    warmLead: 0,
+    coldLead: 0,
+    visited: 0,
+    visiting:0,
+    demoAttended:0,
+    lostOpportunity:0,
+    upcoming: 0,
+    ongoing: 0,
+    onHold: 0,
+    completed: 0
+  });
+  const [selectedItems, setSelectedItems] = useState([]);
   const dataList = useSelector((state) => state[type]?.[type]);
-  const newDataItem = useSelector((state) => state[type]?.["newItem"]);
+  const newDataItem = useSelector((state) => state[type]);
   const dispatch = useDispatch();
+  const [actionItem, setActionItem] = useState("Select an option");
+  const [isActionOpen, setIsActionOpen] = useState(false);
+  const [statuses, setStatuses] =useState ([]);
+  const [totalItems, setTotalItems] = useState(0);
+  const [totalPages, setTotalPages] = useState(0);
 
   const generateOptions = (type) => [
     `All ${type}`,
@@ -40,16 +86,16 @@ const DataList = ({ type, items }) => {
   const options = generateOptions(type.charAt(0).toUpperCase() + type.slice(1));
 
   useEffect(() => {
-    if (type === "leads") {
-      dispatch(getLeadsApi());
-    } else if (type === "opportunities") {
-      dispatch(getOpportunityApi());
-    } else if (type === "learners") {
-      dispatch(getlearnerApi());
+    
+      if (type === "leads") {
+        dispatch(getLeadsApi());
+      } else if (type === "opportunities") {
+        dispatch(getOpportunityApi());
+      } else if (type === "learners") {
+        dispatch(getlearnerApi());
+      
     }
-
-  },
-  [newDataItem]);
+  }, [newDataItem?.newItem, newDataItem?.deleteItem]);
 
   const handleToggle = () => {
     setIsOpen(!isOpen);
@@ -59,6 +105,36 @@ const DataList = ({ type, items }) => {
     setSelectedOption(option);
     setIsOpen(false);
   };
+
+  
+  const toggleAction = () => {
+    setIsActionOpen(!isActionOpen);
+  };
+
+  const handleAction = (item) => {
+
+    if (item === 'delete') {
+      selectedItems.forEach(item => {
+        if(type === 'leads') {
+        dispatch(deleteLeadsApi(item.id));
+      } else if (type === 'opportunities') {
+        dispatch(deleteOpportunityApi(item.id));
+      } else if (type === 'learners') {
+        dispatch(deleteLearnerApi(item.id));
+      }
+      });
+    }
+    setActionItem(item);
+    setIsActionOpen(false);
+  };
+
+  const handleCurrentDataList = (filteredList) => {
+    const currentDataList = filteredList?.slice(
+      (currentPage - 1) * ITEMS_PER_PAGE,
+      currentPage * ITEMS_PER_PAGE
+    );
+    setFilteredDataList(currentDataList ?? []);
+  }
 
   const filterItemsByDate = (items, option) => {
     const today = new Date();
@@ -113,6 +189,8 @@ const DataList = ({ type, items }) => {
         break;
     }
 
+    // handleCurrentDataList(filteredItems);
+
     setFilteredDataList(filteredItems);
   };
 
@@ -121,32 +199,82 @@ const DataList = ({ type, items }) => {
     [dataList, selectedOption]
   );
 
+  const toggleViewMode = (mode) => {
+    setViewMode(mode);
+  };
+
   useEffect(() => {
-    const filterDataList = [...dataList];
+    if (type === 'leads') {
+       setStatuses(["notContacted", "attempted", "warmLead", "coldLead"])
+    } else if (type === 'opportunities') {
+      setStatuses(["visiting","visited","demoAttended", "lostOpportunity"])
+    } else if (type === 'learners') {
+      setStatuses(["upcoming","ongoing","onHold","completed"])
+
+    }
+    const filterDataList = [...(dataList ?? [])];
     const tableViewData = {
-      notContacted: dataList.filter(
+      notContacted: dataList?.filter(
         (item) => item.leadStatus === "notContacted"
       ).length,
-      attempted: dataList.filter(
-        (item) => item.leadStatus === "notContacted"
-      ).length,
-      warmLead: dataList.filter(
-        (item) => item.leadStatus === "notContacted"
-      ).length,
-      coldLead: dataList.filter(
-        (item) => item.leadStatus === "notContacted"
-      ).length,
+      attempted: dataList?.filter((item) => item.leadStatus === "attempted")
+        .length,
+      warmLead: dataList?.filter((item) => item.leadStatus === "warmLead")
+        .length,
+      coldLead: dataList?.filter((item) => item.leadStatus === "coldLead")
+        .length,
+        visited: dataList?.filter((item) => item.opportunityStatus === "visited")
+        .length,
+        visiting: dataList?.filter((item) => item.opportunityStatus === "visiting")
+        .length,
+        demoAttended: dataList?.filter((item) => item.opportunityStatus === "demoAttended")
+        .length,
+        lostOpportunity: dataList?.filter((item) => item.opportunityStatus === "lostOpportunity")
+        .length,
+    upcoming: dataList?.filter((item) => item.leanerStage === "upcoming").length,
+    ongoing: dataList?.filter((item) => item.leanerStage === "ongoing").length,
+    onHold: dataList?.filter((item) => item.leanerStage === "onHold").length,
+    completed: dataList?.filter((item) => item.leanerStage === "completed").length
     };
     setTableDataView(tableViewData);
+
+    const kanbanView = {
+      notContacted: dataList?.filter(
+        (item) => item.leadStatus === "notContacted"
+      ).reduce(
+        (sum, item) => sum + item.feeQuoted, 0
+      ),
+      attempted: dataList?.filter((item) => item.leadStatus === "attempted")
+        .reduce(
+          (sum, item) => sum + item.feeQuoted, 0
+        ),
+      warmLead: dataList?.filter((item) => item.leadStatus === "warmLead")
+        .reduce(
+          (sum, item) => sum + item.feeQuoted, 0
+        ),
+      coldLead: dataList?.filter((item) => item.leadStatus === "coldLead")
+        .reduce(
+          (sum, item) => sum + item.feeQuoted, 0
+        )
+    };
+
+     const totalItems = filterDataList?.length;
+  const totalPages = Math.ceil(totalItems / ITEMS_PER_PAGE);
+  console.log(totalItems, totalPages);
+    setKanbanDataView(kanbanView);
+    setTotalItems(totalItems);
+    setTotalPages(totalPages);
+    // handleCurrentDataList([...filterDataList]);
+
     setFilteredDataList(filterDataList ?? []);
   }, [dataList]);
 
-  const totalItems = filteredDataList?.length;
-  const totalPages = Math.ceil(totalItems / ITEMS_PER_PAGE);
-  const paginatedData = filteredDataList?.slice(
-    (currentPage - 1) * ITEMS_PER_PAGE,
-    currentPage * ITEMS_PER_PAGE
-  );
+  // const totalItems = filteredDataList?.length;
+  // const totalPages = Math.ceil(totalItems / ITEMS_PER_PAGE);
+  // const paginatedData = filteredDataList?.slice(
+  //   (currentPage - 1) * ITEMS_PER_PAGE,
+  //   currentPage * ITEMS_PER_PAGE
+  // );
 
   const handleSearchQuery = (searchQuery) => {
     const filterDataList = dataList?.filter((item) =>
@@ -159,13 +287,14 @@ const DataList = ({ type, items }) => {
     );
 
     setSearchQuery(searchQuery);
-
+    // handleCurrentDataList(filterDataList);
     setFilteredDataList(filterDataList ?? []);
   };
 
   const handlePageChange = (page) => {
     if (page >= 1 && page <= totalPages) {
       setCurrentPage(page);
+      // handleCurrentDataList(dataList);
     }
   };
 
@@ -188,9 +317,7 @@ const DataList = ({ type, items }) => {
       };
 
       dispatch(createLeadsApi(itemToBeAdded));
-        dispatch(getLeadsApi());
-
-
+      dispatch(getLeadsApi());
     } else if (type === "opportunities") {
       const itemToBeAdded = {
         name: newItem.name,
@@ -214,9 +341,8 @@ const DataList = ({ type, items }) => {
       };
 
       dispatch(createOpportunityApi(itemToBeAdded));
-        dispatch(getOpportunityApi())
-    }
-    else if (type === "learners") {
+      dispatch(getOpportunityApi());
+    } else if (type === "learners") {
       const itemToBeAdded = {
         firstname: newItem.firstname,
         lastname: newItem.lastname,
@@ -250,25 +376,39 @@ const DataList = ({ type, items }) => {
       console.log(newItem);
 
       dispatch(createLearnerApi(itemToBeAdded));
-        dispatch(getlearnerApi())
+      dispatch(getlearnerApi());
     }
-  
   };
 
   const handleStatusFilters = (status) => {
-    console.log('status', status);
+    console.log("status", status);
     const isStatusAlreadySelected = selectedStatus === status;
     let filterDataList = [];
     if (isStatusAlreadySelected) {
       filterDataList = [...dataList];
-       setSelectedStatus('');
+      setSelectedStatus("");
     } else {
-      filterDataList = dataList?.filter((item) =>
-       item.leadStatus === status
-      );
+      filterDataList = dataList?.filter((item) => item.leadStatus === status);
       setSelectedStatus(status);
     }
+
+    // handleCurrentDataList(filterDataList);
+
     setFilteredDataList(filterDataList ?? []);
+  };
+
+  const handleSelectedItems = (e, item) => {
+    e.stopPropagation();
+
+    const selectedItemIndex = selectedItems.findIndex(selectedItem => selectedItem.id === item.id);
+    let items = [...selectedItems];
+    if (selectedItemIndex > -1) {
+      items.splice(selectedItemIndex, 1);
+    } else {
+      items.push(item);
+    }
+    console.log(items);
+    setSelectedItems(items);
   }
 
   const getName = (item) => {
@@ -276,7 +416,7 @@ const DataList = ({ type, items }) => {
       return item.leadname;
     } else if (type === "opportunities") {
       return item.name;
-    }else if (type === "learners") {
+    } else if (type === "learners") {
       return item.lastname;
     }
   };
@@ -336,10 +476,22 @@ const DataList = ({ type, items }) => {
                 addNewItem={addNewItem}
               />
             </div>
-            <button className="flex items-center border rounded-md px-4 py-1 gap-1">
+            <div>
+            <button
+              onClick={toggleAction}
+              className="flex items-center border rounded-md px-4 py-1 gap-1"
+            >
               Actions
               <FaChevronDown className="ml-1 text-xs items-center font-thin" />
             </button>
+            {isActionOpen && (
+              <ul className="absolute z-10 bg-white border border-gray-300 rounded-md shadow-lg top-12 w-50 mr-5">
+                <li className="p-2 text-gray-700 font-medium hover:bg-gray-100 cursor-pointer text-base border-b-2 rounded-lg" onClick={() => handleAction("delete")}>Delete</li>
+                <li className="p-2 text-gray-700 font-medium hover:bg-gray-100 cursor-pointer text-base border-b-2 rounded-lg" onClick={() => handleAction("editProfile")}>Edit Profile</li>
+               
+              </ul>
+            )}
+            </div>
           </div>
         </div>
 
@@ -353,28 +505,131 @@ const DataList = ({ type, items }) => {
               className="border p-1 mx-2 block w-full h-8 rounded-lg border-gray-600"
             />
           </div>
-{type !=='courses' && ( 
-  <div className="inline-flex rounded-md shadow-sm">
-            <button className="inline-flex gap-2 items-center px-4 py-1 text-sm font-normal border border-gray-600 focus:border-transparent' transition duration-700 rounded-s-lg text-gray-900 bg-transparent" onClick={() => handleStatusFilters('notContacted')}>
-              Not Contacted
-              <p className="bg-rose-600 py-1 px-2.5 rounded-full">{tableDataView.notContacted}</p>
-            </button>
-            <button className="inline-flex gap-2 items-center px-4 py-1 text-sm font-normal border border-gray-600 focus:border-transparent' transition duration-700  text-gray-900 bg-transparent" onClick={() => handleStatusFilters('attempted')}>
-              Attempted
-              <p className="bg-rose-600 py-1 px-2.5 rounded-full">0</p>
-            </button>
-            <button className="inline-flex gap-2 items-center px-4 py-1 text-sm font-normal border border-gray-600 focus:border-transparent' transition duration-700  text-gray-900 bg-transparent" onClick={() => handleStatusFilters('warmLead')}>
-              Warm Lead
-              <p className="bg-rose-600 py-1 px-2.5 rounded-full">0</p>
-            </button>
-            <button className="inline-flex gap-2 items-center px-4 py-1 text-sm font-normal border border-gray-600 focus:border-transparent' transition duration-700 rounded-e-lg text-gray-900 bg-transparent" onClick={() => handleStatusFilters('coldLead')}>
-              Cold Lead
-              <p className="bg-rose-600 py-1 px-2.5 rounded-full">0</p>
-            </button>
-          </div>) }
-         
+          {type === "leads"? (
+            <div className="inline-flex rounded-md shadow-sm">
+              <button
+                className="inline-flex gap-2 items-center px-4 py-1 text-sm font-normal border border-gray-600 focus:border-transparent' transition duration-700 rounded-s-lg text-gray-900 bg-transparent"
+                onClick={() => handleStatusFilters("notContacted")}
+              >
+                Not Contacted
+                <p className="bg-rose-600 py-1 px-2.5 rounded-full">
+                  {tableDataView.notContacted}
+                </p>
+              </button>
+              <button
+                className="inline-flex gap-2 items-center px-4 py-1 text-sm font-normal border border-gray-600 focus:border-transparent' transition duration-700  text-gray-900 bg-transparent"
+                onClick={() => handleStatusFilters("attempted")}
+              >
+                Attempted
+                <p className="bg-rose-600 py-1 px-2.5 rounded-full">
+                  {tableDataView.attempted}
+                </p>
+              </button>
+              <button
+                className="inline-flex gap-2 items-center px-4 py-1 text-sm font-normal border border-gray-600 focus:border-transparent' transition duration-700  text-gray-900 bg-transparent"
+                onClick={() => handleStatusFilters("warmLead")}
+              >
+                Warm Lead
+                <p className="bg-rose-600 py-1 px-2.5 rounded-full">
+                  {tableDataView.warmLead}
+                </p>
+              </button>
+              <button
+                className="inline-flex gap-2 items-center px-4 py-1 text-sm font-normal border border-gray-600 focus:border-transparent' transition duration-700 rounded-e-lg text-gray-900 bg-transparent"
+                onClick={() => handleStatusFilters("coldLead")}
+              >
+                Cold Lead
+                <p className="bg-rose-600 py-1 px-2.5 rounded-full">
+                  {tableDataView.coldLead}
+                </p>
+              </button>
+            </div>
+          ) : type === "opportunities" ? (
+            <div className="inline-flex rounded-md shadow-sm">
+              <button
+                className="inline-flex gap-2 items-center px-4 py-1 text-sm font-normal border border-gray-600 focus:border-transparent' transition duration-700 rounded-s-lg text-gray-900 bg-transparent"
+                onClick={() => handleStatusFilters("visiting")}
+              >
+                Visting
+                <p className="bg-rose-600 py-1 px-2.5 rounded-full">
+                  {tableDataView.visiting}
+                </p>
+              </button>
+              <button
+                className="inline-flex gap-2 items-center px-4 py-1 text-sm font-normal border border-gray-600 focus:border-transparent' transition duration-700  text-gray-900 bg-transparent"
+                onClick={() => handleStatusFilters("visited")}
+              >
+                Visited
+                <p className="bg-rose-600 py-1 px-2.5 rounded-full">
+                  {tableDataView.visited}
+                </p>
+              </button>
+              <button
+                className="inline-flex gap-2 items-center px-4 py-1 text-sm font-normal border border-gray-600 focus:border-transparent' transition duration-700  text-gray-900 bg-transparent"
+                onClick={() => handleStatusFilters("demoAttended")}
+              >
+                Demo Attended
+                <p className="bg-rose-600 py-1 px-2.5 rounded-full">
+                  {tableDataView.demoAttended}
+                </p>
+              </button>
+              <button
+                className="inline-flex gap-2 items-center px-4 py-1 text-sm font-normal border border-gray-600 focus:border-transparent' transition duration-700 rounded-e-lg text-gray-900 bg-transparent"
+                onClick={() => handleStatusFilters("lostOpportunity")}
+              >
+                Lost Opportunity
+                <p className="bg-rose-600 py-1 px-2.5 rounded-full">
+                  {tableDataView.lostOpportunity}
+                </p>
+              </button>
+            </div>
+          ): type === "learners" ?(
+            <div className="inline-flex rounded-md shadow-sm">
+              <button
+                className="inline-flex gap-2 items-center px-4 py-1 text-sm font-normal border border-gray-600 focus:border-transparent' transition duration-700 rounded-s-lg text-gray-900 bg-transparent"
+                onClick={() => handleStatusFilters("upcoming")}
+              >
+                Upcoming
+                <p className="bg-rose-600 py-1 px-2.5 rounded-full">
+                  {tableDataView.upcoming}
+                </p>
+              </button>
+              <button
+                className="inline-flex gap-2 items-center px-4 py-1 text-sm font-normal border border-gray-600 focus:border-transparent' transition duration-700  text-gray-900 bg-transparent"
+                onClick={() => handleStatusFilters("ongoing")}
+              >
+                Ongoing
+                <p className="bg-rose-600 py-1 px-2.5 rounded-full">
+                  {tableDataView.ongoing}
+                </p>
+              </button>
+              <button
+                className="inline-flex gap-2 items-center px-4 py-1 text-sm font-normal border border-gray-600 focus:border-transparent' transition duration-700  text-gray-900 bg-transparent"
+                onClick={() => handleStatusFilters("onHold")}
+              >
+                On Hold
+                <p className="bg-rose-600 py-1 px-2.5 rounded-full">
+                  {tableDataView.onHold}
+                </p>
+              </button>
+              <button
+                className="inline-flex gap-2 items-center px-4 py-1 text-sm font-normal border border-gray-600 focus:border-transparent' transition duration-700 rounded-e-lg text-gray-900 bg-transparent"
+                onClick={() => handleStatusFilters("completed")}
+              >
+                Completed
+                <p className="bg-rose-600 py-1 px-2.5 rounded-full">
+                  {tableDataView.completed}
+                </p>
+              </button>
+            </div>
+          ): ("")
+        }
+
           <div className="flex items-center">
-            <button className="flex border rounded-l-lg py-1 px-4 gap-2 w-1/2 border-gray-600">
+            <button
+              onClick={() => toggleViewMode("table")}
+              className="flex border rounded-l-lg py-1 px-4 gap-2 w-1/2 border-gray-600"
+            >
               <Image
                 src="/images/table-icon.png"
                 alt="table-icon-img"
@@ -384,7 +639,10 @@ const DataList = ({ type, items }) => {
               />
               Table
             </button>
-            <button className="flex border rounded-r-lg py-1 px-4 gap-2 w-1/2 border-gray-600">
+            <button
+              onClick={() => toggleViewMode("kanban")}
+              className="flex border rounded-r-lg py-1 px-4 gap-2 w-1/2 border-gray-600 hover: bg-blue"
+            >
               <Image
                 src="/images/kanban-icon.png"
                 alt="kanban-icon-img"
@@ -397,175 +655,302 @@ const DataList = ({ type, items }) => {
           </div>
         </div>
 
-        <div className="p-4 flex-grow overflow-hidden ">
-          <div className="h-full overflow-y-auto">
-            <table className=" border border-gray-300 w-full table-auto">
-              <thead className="border border-gray-300 h-12 bg-gray-100">
-                <tr className="text-left">
-                  <th>
-                    <input type="checkbox" className="form-checkbox" />
-                  </th>
-                  {type === "courses" ? (
-                    <>
-                      <th>Course</th>
-                      <th>Description</th>
-                      <th>Course Fee</th>
-                    </>
-                  ) :  type === "learners" ? (
-                    <>
-                      <th className="border-r border-gray-400 ">Created Time</th>
-                      <th className="border-r border-gray-400 ">Registered Date</th>
-                      <th className="border-r border-gray-400 ">Last Name</th>
-                      <th className="border-r border-gray-400 ">Phone</th>
-                      <th className="border-r border-gray-400 ">Email</th>
-                      <th className="border-r border-gray-400 ">Mode of Class</th>
-                      <th className="border-r border-gray-400 ">Tech Stack</th>
-                      <th className="border-r border-gray-400 ">Total Fees</th>
-                      <th className="border-r border-gray-400 ">Fee Paid</th>
-                      <th className="border-r border-gray-400 ">Due Amount</th>
-                      <th className="border-r border-gray-400 ">Due Date</th>
-
-                    </>
-                  ) : (
-                    <>
-                      <th className="border-r border-gray-400 ">Created on</th>
-                      <th className="border-r border-gray-400 ">Lead Status</th>
-                      <th className="border-r border-gray-400 ">Name</th>
-                      <th className="border-r border-gray-400 ">Phone</th>
-                      <th className="border-r border-gray-400 ">Stack</th>
-                      <th className="w-50">Course</th>
-                    </>
-                  )}
-                </tr>
-              </thead>
-              <tbody className="text-left font-normal">
-                {filteredDataList.map((item) => (
-                  <tr
-                    key={item.id}
-                    className="cursor-pointer"
-                    onClick={() => handleRowClick(item.id)}
-                  >
-                    <td
-                      className="text-left font-normal"
-                      onClick={(e) => e.stopPropagation()}
-                    >
+        {viewMode === "table" ? (
+          <div className="p-4 flex-grow overflow-hidden ">
+            <div className="h-full overflow-y-auto ">
+              <table className=" border border-gray-300 w-full table-auto">
+                <thead className="border border-gray-300 h-12 bg-gray-100">
+                  <tr className="text-left">
+                    <th>
                       <input type="checkbox" className="form-checkbox" />
-                    </td>
-
+                    </th>
                     {type === "courses" ? (
                       <>
-                        <td className="text-left font-normal">{item.course}</td>
-                        <td className="text-left font-normal">
-                          {item.description}
-                        </td>
-                        <td className="text-left font-normal">
-                          {item.courseFee}
-                        </td>
+                        <th>Course</th>
+                        <th>Description</th>
+                        <th>Course Fee</th>
                       </>
                     ) : type === "learners" ? (
                       <>
-                        <td className="text-left font-normal">{item.createdAt}</td>
-                        <td className="text-left font-normal">
-                          {item.registeredDate}
-                        </td>
-                        <td className="text-left font-normal">
-                          {item.lastname}
-                        </td>
-                        <td className="text-left font-normal">
-                          {item.phone}
-                        </td>
-                        <td className="text-left font-normal">
-                          {item.email}
-                        </td>
-                        <td className="text-left font-normal">
-                          {item.modeOfClass}
-                        </td>
-                        <td className="text-left font-normal">
-                          {item.techStack}
-                        </td>
-                        <td className="text-left font-normal">
-                          {item.totalFees}
-                        </td>
-                        <td className="text-left font-normal">
-                          {item.feePaid}
-                        </td>
-                        <td className="text-left font-normal">
-                          {item.dueAmount}
-                        </td>
-                        <td className="text-left font-normal">
-                          {item.dueDate}
-                        </td>
-                        <td className="text-left font-normal">
-                          {item.lastname}
-                        </td>
+                        <th className="border-r border-gray-400 ">
+                          Created Time
+                        </th>
+                        <th className="border-r border-gray-400 ">
+                          Registered Date
+                        </th>
+                        <th className="border-r border-gray-400 ">Last Name</th>
+                        <th className="border-r border-gray-400 ">Phone</th>
+                        <th className="border-r border-gray-400 ">Email</th>
+                        <th className="border-r border-gray-400 ">
+                          Mode of Class
+                        </th>
+                        <th className="border-r border-gray-400 ">
+                          Tech Stack
+                        </th>
+                        <th className="border-r border-gray-400 ">
+                          Total Fees
+                        </th>
+                        <th className="border-r border-gray-400 ">Fee Paid</th>
+                        <th className="border-r border-gray-400 ">
+                          Due Amount
+                        </th>
+                        <th className="border-r border-gray-400 ">Due Date</th>
                       </>
-                    ) :(
+                    ) : type === "leads" ?(
                       <>
-                        <td className="text-left font-normal">
-                          {item.createdAt}
-                        </td>
-                        <td className="text-left font-normal">
-                          {item.leadStatus}
-                        </td>
-                        <td className="text-left font-normal">
-                          {getName(item)}
-                        </td>
-                        <td className="text-left font-normal">{item.phone}</td>
-                        <td className="text-left font-normal">{item.stack}</td>
-                        <td className="text-left font-normal">{item.course}</td>
+                        <th className="border-r border-gray-400 ">
+                          Created on
+                        </th>
+                        <th className="border-r border-gray-400 ">
+                          Lead Status
+                        </th>
+                        <th className="border-r border-gray-400 ">Name</th>
+                        <th className="border-r border-gray-400 ">Phone</th>
+                        <th className="border-r border-gray-400 ">Stack</th>
+                        <th className="w-50">Course</th>
+                      </>
+                    ):(
+                      <>
+                        <th className="border-r border-gray-400 ">
+                          Created on
+                        </th>
+                        <th className="border-r border-gray-400 ">
+                          Opportunity Status
+                        </th>
+                        <th className="border-r border-gray-400 ">Name</th>
+                        <th className="border-r border-gray-400 ">Phone</th>
+                        <th className="border-r border-gray-400 ">Stack</th>
+                        <th className="w-50">Course</th>
                       </>
                     )}
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
 
-        <div className="border-t-2 p-3 bottom-0 w-full">
-          <div className=" flex items-center justify-end text-sm mr-5 gap-10">
-            <div className="flex items-center gap-1 ">
-              {totalItems > 0 ? (
-                <>
-                  <span className="font-bold">
-                    {(currentPage - 1) * ITEMS_PER_PAGE + 1}
-                  </span>
-                  {" to "}
-                  <span className="font-bold">
-                    {Math.min(currentPage * ITEMS_PER_PAGE, totalItems)}
-                  </span>
-                  {" of "}
-                  <span className="font-bold">{totalItems}</span>
-                </>
-              ) : (
-                "No items to display"
+                  </tr>
+                </thead>
+                <tbody className="text-left font-normal">
+                  {filteredDataList?.map((item) => (
+                    <tr
+                      key={item.id}
+                      className="cursor-pointer"
+                      onClick={() => handleRowClick(item.id)}
+                    >
+                      <td
+                        className="text-left font-normal"
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        <input type="checkbox" className="form-checkbox" onClick={(e) => handleSelectedItems(e, item)} />
+                      </td>
+
+                      {type === "courses" ? (
+                        <>
+                          <td className="text-left font-normal">
+                            {item.course}
+                          </td>
+                          <td className="text-left font-normal">
+                            {item.description}
+                          </td>
+                          <td className="text-left font-normal">
+                            {item.courseFee}
+                          </td>
+                        </>
+                      ) : type === "learners" ? (
+                        <>
+                          <td className="text-left font-normal">
+                            {item.createdAt}
+                          </td>
+                          <td className="text-left font-normal">
+                            {item.registeredDate}
+                          </td>
+                          <td className="text-left font-normal">
+                            {item.lastname}
+                          </td>
+                          <td className="text-left font-normal">
+                            {item.phone}
+                          </td>
+                          <td className="text-left font-normal">
+                            {item.email}
+                          </td>
+                          <td className="text-left font-normal">
+                            {item.modeOfClass}
+                          </td>
+                          <td className="text-left font-normal">
+                            {item.techStack}
+                          </td>
+                          <td className="text-left font-normal">
+                            {item.currency}
+                          </td>
+                          <td className="text-left font-normal">
+                            {item.currency}
+                          </td>
+                          <td className="text-left font-normal">
+                            {item.currency}
+                          </td>
+                          <td className="text-left font-normal">
+                            {item.dueDate}
+                          </td>
+                        </>
+                      ) : type === "leads" ? (
+                        <>
+                          <td className="text-left font-normal">
+                            {item.createdAt}
+                          </td>
+                          <td className="text-left font-normal">
+                            {item.leadStatus}
+                          </td>
+                          <td className="text-left font-normal">
+                            {getName(item)}
+                          </td>
+                          <td className="text-left font-normal">
+                            {item.phone}
+                          </td>
+                          <td className="text-left font-normal">
+                            {item.stack}
+                          </td>
+                          <td className="text-left font-normal">
+                            {item.course}
+                          </td>
+                        </>
+                      ): (
+                        <>
+                          <td className="text-left font-normal">
+                            {item.createdAt}
+                          </td>
+                          <td className="text-left font-normal">
+                            {item.opportunityStatus}
+                          </td>
+                          <td className="text-left font-normal">
+                            {getName(item)}
+                          </td>
+                          <td className="text-left font-normal">
+                            {item.phone}
+                          </td>
+                          <td className="text-left font-normal">
+                            {item.stack}
+                          </td>
+                          <td className="text-left font-normal">
+                            {item.course}
+                          </td>
+                        </>
+                      )
+                    }
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        ) : (
+          <div className="mt-5 px-4 py-0 overflow-x-auto w-full h-full">
+            <div className="flex gap-3">
+              {statuses.map(
+                (status) => (
+                  <div key={status} className="h-full grid gap-4">
+                    <div
+                      className={`border-t-4 rounded-t-md h-20 min-w-96 py-3 px-5 ${
+                        status === "notContacted"
+                          ? "bg-green-100 border-t-green-300"
+                          : status === "attempted"
+                          ? "bg-blue-100 border-t-blue-300"
+                          : status === "warmLead"
+                          ? "bg-orange-100 border-t-stone-400"
+                          : status === "coldLead"
+                          ? "bg-indigo-100 border-t-slate-400"
+                          : status === "visited"
+                          ? "bg-green-100 border-t-slate-400"
+                          : status === "visiting"
+                          ? "bg-blue-100 border-t-slate-400"
+                          : status === "demoAttended"
+                          ? "bg-orange-100 border-t-slate-400"
+                          : status === "lostOpportunity"
+                          ? "bg-indigo-100 border-t-slate-400"
+                          : ""
+                      }`}
+                    >
+                      <h3 className="text-base font-semibold">{status}</h3>
+                      <p className="text-sm font-semibold">
+                        ₹ {kanbanDataView?.[status]}
+                        <span className="text-sm font-medium"> Leads</span>
+                      </p>
+                    </div>
+                    <div className="bg-gray-200 h-80 p-2 max-w-96 flex rounded">
+                      <div className="flex flex-col">
+                        {filteredDataList
+                          .filter((item) => (item.leadStatus === status) || (item.opportunityStatus=== status))
+                          .map((item) => (
+                            <div
+                              key={item.id}
+                              className="text-base"
+                              onClick={() => handleRowClick(item.id)}
+                            >
+                              <div className="flex flex-row gap-1">
+                                <p className="flex flex-row">
+                                  Name: <span>{getName(item)}</span>
+                                </p>
+                                <p>
+                                  Phone:<span>{item.phone}</span>
+                                </p>
+                                <p>
+                                  Fee: <span>{item.feeQuoted}</span>/-
+                                </p>
+                              </div>
+                            </div>
+                          ))}
+                      </div>
+                    </div>
+                  </div>
+                )
               )}
             </div>
-            <div className="flex items-center gap-2 ">
-              <span
-                onClick={() => handlePageChange(currentPage - 1)}
-                disabled={currentPage === 1}
-                className="px-2 py-1 flex gap-6"
-              >
-                <p>{"|<"}</p>
-                &lt;
-              </span>
-              <span className="flex gap-1">
-                Page <h1 className="font-bold">{currentPage}</h1> of{" "}
-                <h1 className="font-bold">{totalPages}</h1>
-              </span>
+          </div>
+        )}
 
-              <span
-                onClick={() => handlePageChange(currentPage + 1)}
-                disabled={currentPage === totalPages}
-                className="px-2 py-1 flex gap-6"
-              >
-                &gt;
-                <p>{">|"}</p>
-              </span>
+        {viewMode === "table" ? (
+          <div className="border-t-2 p-3 bottom-0 w-full">
+            <div className=" flex items-center justify-end text-sm mr-5 gap-10">
+              <div className="flex items-center gap-1 ">
+                {totalItems > 0 ? (
+                  <>
+                    <span className="font-bold">
+                      {(currentPage - 1) * ITEMS_PER_PAGE + 1}
+                    </span>
+                    {" to "}
+                    <span className="font-bold">
+                      {Math.min(currentPage * ITEMS_PER_PAGE, totalItems)}
+                    </span>
+                    {" of "}
+                    <span className="font-bold">{totalItems}</span>
+                  </>
+                ) : (
+                  "No items to display"
+                )}
+              </div>
+              <div className="flex items-center gap-2 ">
+                <span
+                  onClick={() => handlePageChange(currentPage - 1)}
+                  disabled={currentPage === 1}
+                  className="px-2 py-1 flex gap-6"
+                >
+                  <p>{"|<"}</p>
+                  &lt;
+                </span>
+                <span className="flex gap-1">
+                  Page <h1 className="font-bold">{currentPage}</h1> of{" "}
+                  <h1 className="font-bold">{totalPages}</h1>
+                </span>
+
+                <span
+                  onClick={() => handlePageChange(currentPage + 1)}
+                  disabled={currentPage === totalPages}
+                  className="px-2 py-1 flex gap-6"
+                >
+                  &gt;
+                  <p>{">|"}</p>
+                </span>
+              </div>
             </div>
           </div>
-        </div>
+        ) : (
+          ""
+        )}
       </div>
     </div>
   );

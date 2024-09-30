@@ -41,8 +41,21 @@ export const updatelearnerApi = createAsyncThunk('updatelearnerApi', async (payl
     }
 });
 
+export const deleteLearnerApi = createAsyncThunk('deleteLearnerApi', async (id) => {
+    try {
+        const response = await axios.delete('http://localhost:4000/api/learner/' + id);
+        return response;
+    } catch(error) {
+        if (error.response) {
+            return error.response;
+        } else {
+            return error.message;
+        }
+    }
+});
+
 const getInitialLearnersState = () => {
-    return { isLoading: false, error: null, learners: [], newItem: {} };
+    return { isLoading: false, error: null, learners: [], newItem: {}, deleteIte: {} };
   };
 
 const learnersSlice = createSlice({
@@ -68,11 +81,23 @@ const learnersSlice = createSlice({
             .addCase(createLearnerApi.fulfilled, (state, action) => {
                 if (action.payload.status === 200 || action.payload.status === 201) {
 
-                    return {...state,newItem: action.payload.data.data};
+                    return {...state,newItem: action.payload.data.data, isLoading: false};
                 } else {
-                    return { ...state, error: action.payload, };
+                    return { ...state, error: action.payload, isLoading: false };
                 }
-            })      
+            })  
+            
+            .addCase(deleteLearnerApi.pending, (state, action) => {
+                return { ...state, isLoading: true };
+            })
+            .addCase(deleteLearnerApi.fulfilled, (state, action) => {
+                if (action.payload.status === 200 || action.payload.status === 201) {
+
+                    return {...state, deleteItem: action.payload.data.data, isloading: false};
+                } else {
+                    return { ...state, error: action.payload, isLoading: false};
+                }
+            })
     }
 
 

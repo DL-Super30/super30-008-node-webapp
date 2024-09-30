@@ -41,8 +41,21 @@ export const updateOpportunityApi = createAsyncThunk('updateOpportunityApi', asy
     }
 });
 
+export const deleteOpportunityApi = createAsyncThunk('deleteOpportunityApi', async (id) => {
+    try {
+        const response = await axios.delete('http://localhost:4000/api/opportunity/' + id);
+        return response;
+    } catch(error) {
+        if (error.response) {
+            return error.response;
+        } else {
+            return error.message;
+        }
+    }
+});
+
 const getInitialOpportunitiesState = () => {
-    return { isLoading: false, error: null, opportunities: [], newItem: {} };
+    return { isLoading: false, error: null, opportunities: [], newItem: {}, deleteItem: {} };
   };
 
 const opportunitiesSlice = createSlice({
@@ -68,9 +81,21 @@ const opportunitiesSlice = createSlice({
             .addCase(createOpportunityApi.fulfilled, (state, action) => {
                 if (action.payload.status === 200 || action.payload.status === 201) {
 
-                    return {...state, newItem: action.payload.data.data};
+                    return {...state, newItem: action.payload.data.data, isLoading: false};
                 } else {
-                    return { ...state, error: action.payload, };
+                    return { ...state, error: action.payload, isLoading: false};
+                }
+            })
+
+            .addCase(deleteOpportunityApi.pending, (state, action) => {
+                return { ...state, isLoading: true };
+            })
+            .addCase(deleteOpportunityApi.fulfilled, (state, action) => {
+                if (action.payload.status === 200 || action.payload.status === 201) {
+
+                    return {...state, deleteItem: action.payload.data?.data, isLoading: false};
+                } else {
+                    return { ...state, error: action.payload, isLoading: false};
                 }
             })
     }
