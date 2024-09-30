@@ -33,6 +33,7 @@ export default function Dashboard() {
   const [tableDataView, setTableDataView] = useState();
   const [leadLineChartData, setLeadLineChartData] = useState();
   const [leadPieChartData, setLeadPieChartData] = useState();
+  const[totalLeads, setTotalLeads] = useState();
   const [leadOptions, setLeadOptions] = useState({
     scales: {
       x: {
@@ -53,7 +54,7 @@ export default function Dashboard() {
         },
         ticks: {
           stepSize: 0.5,
-        },
+              },
       },
     },
   });
@@ -185,6 +186,7 @@ export default function Dashboard() {
         },
       ],
     };
+    setTotalLeads(totalLeads);
     setTableDataView(tableViewData);
     setLeadPieChartData(leadPieData);
   }, [leadsData]);
@@ -193,63 +195,63 @@ export default function Dashboard() {
     <div className="gap-4">
         <div className="m-5 ml-15 flex gap-5">
           <div
-            className=" flex flex-row gap-1 border border-transparent rounded shadow-lg w-1/6"
-            onClick={() => handleStatusFilters("notContacted")}
+            className=" flex flex-row gap-3 border border-transparent rounded shadow-lg w-1/6 items-center"
           >
              <Image
               src="/images/customers-icon.png"
               alt="costomers-img"
-              width={30}
-              height={10}
+              width={16}
+              height={16}
+              className="w-8 h-8"
             />
             <div>
             <p>Not Contacted</p>
-            <p className="">{tableDataView?.notContacted}</p>
+            <p className="px-2 font-bold">{tableDataView?.notContacted}</p>
             </div>
           </div>
           <div
-            className=" flex flex-row gap-1 border border-transparent rounded shadow-lg w-1/6"
-            onClick={() => handleStatusFilters("attempted")}
+            className=" flex flex-row gap-1 border border-transparent rounded shadow-lg w-1/6 items-center"
           >
              <Image
               src="/images/customers-icon.png"
               alt="costomers-img"
-              width={30}
-              height={10}
+              width={16}
+              height={16}
+              className="w-8 h-8"
             />
             <div>
             <p>Attempted</p>
-            <p className="">{tableDataView?.attempted}</p>
+            <p className="px-2 font-bold">{tableDataView?.attempted}</p>
             </div>
           </div>
           <div
-            className=" flex flex-row gap-1 border border-transparent rounded shadow-lg w-1/6"
-            onClick={() => handleStatusFilters("warmLead")}
+            className=" flex flex-row gap-1 border border-transparent rounded shadow-lg w-1/6 items-center"
           >
              <Image
               src="/images/customers-icon.png"
               alt="costomers-img"
-              width={30}
-              height={10}
+              width={16}
+              height={16}
+              className="w-8 h-8"
             />
             <div>
             <p>Warm Lead</p>
-            <p className="">{tableDataView?.warmLead}</p>
+            <p className="px-2 font-bold">{tableDataView?.warmLead}</p>
             </div>
           </div>
           <div
-            className=" flex flex-row gap-1 border border-transparent rounded shadow-lg w-1/6"
-            onClick={() => handleStatusFilters("coldLead")}
+            className=" flex flex-row gap-1 border border-transparent rounded shadow-lg w-1/6 items-center"
           >
              <Image
               src="/images/customers-icon.png"
               alt="costomers-img"
-              width={30}
-              height={10}
+              width={16}
+              height={16}
+              className="w-8 h-8"
             />
             <div>
             <p>Cold Lead</p>
-            <p className="">{tableDataView?.coldLead}</p>
+            <p className="px-2 font-bold">{tableDataView?.coldLead}</p>
             </div>
           </div>
         </div>
@@ -259,7 +261,8 @@ export default function Dashboard() {
             <Line data={leadLineChartData} options={leadOptions} />
           )}
         </div>
-        <div className="w-1/2 flex flex-col items-center justify-items-center p-4 w-80 h-80">
+        <div className="w-1/2 flex flex-col gap-2 items-center justify-items-center p-4 w-80 h-80">
+        <h3 className="flex text-xl font-semibold text-violet-900">TotalLeads-<p>{totalLeads}</p></h3>
           {leadPieChartData && (
             <Pie className="w-24 h-24" data={leadPieChartData} options={{}} />
           )}

@@ -6,7 +6,11 @@ import Image from "next/image";
 import Modal from "@/app/modal/modal";
 import { useRouter } from "next/navigation";
 import { useDispatch, useSelector } from "react-redux";
-import { createLeadsApi, deleteLeadsApi, getLeadsApi } from "@/slices/leadsSlice";
+import {
+  createLeadsApi,
+  deleteLeadsApi,
+  getLeadsApi,
+} from "@/slices/leadsSlice";
 import {
   format,
   subDays,
@@ -20,7 +24,11 @@ import {
   deleteOpportunityApi,
   getOpportunityApi,
 } from "@/slices/opportunitiesSlice";
-import { createLearnerApi, deleteLearnerApi, getlearnerApi } from "@/slices/learnersSlice";
+import {
+  createLearnerApi,
+  deleteLearnerApi,
+  getlearnerApi,
+} from "@/slices/learnersSlice";
 
 const DataList = ({ type, items }) => {
   const ITEMS_PER_PAGE = 10;
@@ -41,13 +49,13 @@ const DataList = ({ type, items }) => {
     warmLead: 0,
     coldLead: 0,
     visited: 0,
-    visiting:0,
-    demoAttended:0,
-    lostOpportunity:0,
+    visiting: 0,
+    demoAttended: 0,
+    lostOpportunity: 0,
     upcoming: 0,
     ongoing: 0,
     onHold: 0,
-    completed: 0
+    completed: 0,
   });
   const [kanbanDataView, setKanbanDataView] = useState({
     notContacted: 0,
@@ -55,13 +63,13 @@ const DataList = ({ type, items }) => {
     warmLead: 0,
     coldLead: 0,
     visited: 0,
-    visiting:0,
-    demoAttended:0,
-    lostOpportunity:0,
+    visiting: 0,
+    demoAttended: 0,
+    lostOpportunity: 0,
     upcoming: 0,
     ongoing: 0,
     onHold: 0,
-    completed: 0
+    completed: 0,
   });
   const [selectedItems, setSelectedItems] = useState([]);
   const dataList = useSelector((state) => state[type]?.[type]);
@@ -69,7 +77,7 @@ const DataList = ({ type, items }) => {
   const dispatch = useDispatch();
   const [actionItem, setActionItem] = useState("Select an option");
   const [isActionOpen, setIsActionOpen] = useState(false);
-  const [statuses, setStatuses] =useState ([]);
+  const [statuses, setStatuses] = useState([]);
   const [totalItems, setTotalItems] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
 
@@ -86,14 +94,12 @@ const DataList = ({ type, items }) => {
   const options = generateOptions(type.charAt(0).toUpperCase() + type.slice(1));
 
   useEffect(() => {
-    
-      if (type === "leads") {
-        dispatch(getLeadsApi());
-      } else if (type === "opportunities") {
-        dispatch(getOpportunityApi());
-      } else if (type === "learners") {
-        dispatch(getlearnerApi());
-      
+    if (type === "leads") {
+      dispatch(getLeadsApi());
+    } else if (type === "opportunities") {
+      dispatch(getOpportunityApi());
+    } else if (type === "learners") {
+      dispatch(getlearnerApi());
     }
   }, [newDataItem?.newItem, newDataItem?.deleteItem]);
 
@@ -106,22 +112,20 @@ const DataList = ({ type, items }) => {
     setIsOpen(false);
   };
 
-  
   const toggleAction = () => {
     setIsActionOpen(!isActionOpen);
   };
 
   const handleAction = (item) => {
-
-    if (item === 'delete') {
-      selectedItems.forEach(item => {
-        if(type === 'leads') {
-        dispatch(deleteLeadsApi(item.id));
-      } else if (type === 'opportunities') {
-        dispatch(deleteOpportunityApi(item.id));
-      } else if (type === 'learners') {
-        dispatch(deleteLearnerApi(item.id));
-      }
+    if (item === "delete") {
+      selectedItems.forEach((item) => {
+        if (type === "leads") {
+          dispatch(deleteLeadsApi(item.id));
+        } else if (type === "opportunities") {
+          dispatch(deleteOpportunityApi(item.id));
+        } else if (type === "learners") {
+          dispatch(deleteLearnerApi(item.id));
+        }
       });
     }
     setActionItem(item);
@@ -134,7 +138,7 @@ const DataList = ({ type, items }) => {
       currentPage * ITEMS_PER_PAGE
     );
     setFilteredDataList(currentDataList ?? []);
-  }
+  };
 
   const filterItemsByDate = (items, option) => {
     const today = new Date();
@@ -204,13 +208,12 @@ const DataList = ({ type, items }) => {
   };
 
   useEffect(() => {
-    if (type === 'leads') {
-       setStatuses(["notContacted", "attempted", "warmLead", "coldLead"])
-    } else if (type === 'opportunities') {
-      setStatuses(["visiting","visited","demoAttended", "lostOpportunity"])
-    } else if (type === 'learners') {
-      setStatuses(["upcoming","ongoing","onHold","completed"])
-
+    if (type === "leads") {
+      setStatuses(["notContacted", "attempted", "warmLead", "coldLead"]);
+    } else if (type === "opportunities") {
+      setStatuses(["visiting", "visited", "demoAttended", "lostOpportunity"]);
+    } else if (type === "learners") {
+      setStatuses(["upcoming", "ongoing", "onHold", "completed"]);
     }
     const filterDataList = [...(dataList ?? [])];
     const tableViewData = {
@@ -223,44 +226,45 @@ const DataList = ({ type, items }) => {
         .length,
       coldLead: dataList?.filter((item) => item.leadStatus === "coldLead")
         .length,
-        visited: dataList?.filter((item) => item.opportunityStatus === "visited")
+      visited: dataList?.filter((item) => item.opportunityStatus === "visited")
         .length,
-        visiting: dataList?.filter((item) => item.opportunityStatus === "visiting")
+      visiting: dataList?.filter(
+        (item) => item.opportunityStatus === "visiting"
+      ).length,
+      demoAttended: dataList?.filter(
+        (item) => item.opportunityStatus === "demoAttended"
+      ).length,
+      lostOpportunity: dataList?.filter(
+        (item) => item.opportunityStatus === "lostOpportunity"
+      ).length,
+      upcoming: dataList?.filter((item) => item.learnerStage === "upcoming")
         .length,
-        demoAttended: dataList?.filter((item) => item.opportunityStatus === "demoAttended")
+      ongoing: dataList?.filter((item) => item.learnerStage === "ongoing")
         .length,
-        lostOpportunity: dataList?.filter((item) => item.opportunityStatus === "lostOpportunity")
+      onHold: dataList?.filter((item) => item.learnerStage === "onHold").length,
+      completed: dataList?.filter((item) => item.learnerStage === "completed")
         .length,
-    upcoming: dataList?.filter((item) => item.leanerStage === "upcoming").length,
-    ongoing: dataList?.filter((item) => item.leanerStage === "ongoing").length,
-    onHold: dataList?.filter((item) => item.leanerStage === "onHold").length,
-    completed: dataList?.filter((item) => item.leanerStage === "completed").length
     };
     setTableDataView(tableViewData);
 
     const kanbanView = {
-      notContacted: dataList?.filter(
-        (item) => item.leadStatus === "notContacted"
-      ).reduce(
-        (sum, item) => sum + item.feeQuoted, 0
-      ),
-      attempted: dataList?.filter((item) => item.leadStatus === "attempted")
-        .reduce(
-          (sum, item) => sum + item.feeQuoted, 0
-        ),
-      warmLead: dataList?.filter((item) => item.leadStatus === "warmLead")
-        .reduce(
-          (sum, item) => sum + item.feeQuoted, 0
-        ),
-      coldLead: dataList?.filter((item) => item.leadStatus === "coldLead")
-        .reduce(
-          (sum, item) => sum + item.feeQuoted, 0
-        )
+      notContacted: dataList
+        ?.filter((item) => item.leadStatus === "notContacted")
+        .reduce((sum, item) => sum + item.feeQuoted, 0),
+      attempted: dataList
+        ?.filter((item) => item.leadStatus === "attempted")
+        .reduce((sum, item) => sum + item.feeQuoted, 0),
+      warmLead: dataList
+        ?.filter((item) => item.leadStatus === "warmLead")
+        .reduce((sum, item) => sum + item.feeQuoted, 0),
+      coldLead: dataList
+        ?.filter((item) => item.leadStatus === "coldLead")
+        .reduce((sum, item) => sum + item.feeQuoted, 0),
     };
 
-     const totalItems = filterDataList?.length;
-  const totalPages = Math.ceil(totalItems / ITEMS_PER_PAGE);
-  console.log(totalItems, totalPages);
+    const totalItems = filterDataList?.length;
+    const totalPages = Math.ceil(totalItems / ITEMS_PER_PAGE);
+    console.log(totalItems, totalPages);
     setKanbanDataView(kanbanView);
     setTotalItems(totalItems);
     setTotalPages(totalPages);
@@ -400,7 +404,9 @@ const DataList = ({ type, items }) => {
   const handleSelectedItems = (e, item) => {
     e.stopPropagation();
 
-    const selectedItemIndex = selectedItems.findIndex(selectedItem => selectedItem.id === item.id);
+    const selectedItemIndex = selectedItems.findIndex(
+      (selectedItem) => selectedItem.id === item.id
+    );
     let items = [...selectedItems];
     if (selectedItemIndex > -1) {
       items.splice(selectedItemIndex, 1);
@@ -409,7 +415,7 @@ const DataList = ({ type, items }) => {
     }
     console.log(items);
     setSelectedItems(items);
-  }
+  };
 
   const getName = (item) => {
     if (type === "leads") {
@@ -477,20 +483,29 @@ const DataList = ({ type, items }) => {
               />
             </div>
             <div>
-            <button
-              onClick={toggleAction}
-              className="flex items-center border rounded-md px-4 py-1 gap-1"
-            >
-              Actions
-              <FaChevronDown className="ml-1 text-xs items-center font-thin" />
-            </button>
-            {isActionOpen && (
-              <ul className="absolute z-10 bg-white border border-gray-300 rounded-md shadow-lg top-12 w-50 mr-5">
-                <li className="p-2 text-gray-700 font-medium hover:bg-gray-100 cursor-pointer text-base border-b-2 rounded-lg" onClick={() => handleAction("delete")}>Delete</li>
-                <li className="p-2 text-gray-700 font-medium hover:bg-gray-100 cursor-pointer text-base border-b-2 rounded-lg" onClick={() => handleAction("editProfile")}>Edit Profile</li>
-               
-              </ul>
-            )}
+              <button
+                onClick={toggleAction}
+                className="flex items-center border rounded-md px-4 py-1 gap-1"
+              >
+                Actions
+                <FaChevronDown className="ml-1 text-xs items-center font-thin" />
+              </button>
+              {isActionOpen && (
+                <ul className="absolute z-10 bg-white border border-gray-300 rounded-md shadow-lg top-12 w-50 mr-5">
+                  <li
+                    className="p-2 text-gray-700 font-medium hover:bg-gray-100 cursor-pointer text-base border-b-2 rounded-lg"
+                    onClick={() => handleAction("delete")}
+                  >
+                    Delete
+                  </li>
+                  <li
+                    className="p-2 text-gray-700 font-medium hover:bg-gray-100 cursor-pointer text-base border-b-2 rounded-lg"
+                    onClick={() => handleAction("editProfile")}
+                  >
+                    Edit Profile
+                  </li>
+                </ul>
+              )}
             </div>
           </div>
         </div>
@@ -505,7 +520,7 @@ const DataList = ({ type, items }) => {
               className="border p-1 mx-2 block w-full h-8 rounded-lg border-gray-600"
             />
           </div>
-          {type === "leads"? (
+          {type === "leads" ? (
             <div className="inline-flex rounded-md shadow-sm">
               <button
                 className="inline-flex gap-2 items-center px-4 py-1 text-sm font-normal border border-gray-600 focus:border-transparent' transition duration-700 rounded-s-lg text-gray-900 bg-transparent"
@@ -583,7 +598,7 @@ const DataList = ({ type, items }) => {
                 </p>
               </button>
             </div>
-          ): type === "learners" ?(
+          ) : type === "learners" ? (
             <div className="inline-flex rounded-md shadow-sm">
               <button
                 className="inline-flex gap-2 items-center px-4 py-1 text-sm font-normal border border-gray-600 focus:border-transparent' transition duration-700 rounded-s-lg text-gray-900 bg-transparent"
@@ -622,8 +637,9 @@ const DataList = ({ type, items }) => {
                 </p>
               </button>
             </div>
-          ): ("")
-        }
+          ) : (
+            ""
+          )}
 
           <div className="flex items-center">
             <button
@@ -687,16 +703,10 @@ const DataList = ({ type, items }) => {
                         <th className="border-r border-gray-400 ">
                           Tech Stack
                         </th>
-                        <th className="border-r border-gray-400 ">
-                          Total Fees
-                        </th>
-                        <th className="border-r border-gray-400 ">Fee Paid</th>
-                        <th className="border-r border-gray-400 ">
-                          Due Amount
-                        </th>
-                        <th className="border-r border-gray-400 ">Due Date</th>
+                        <th className="border-r border-gray-400 ">Learner stage</th>
+                        <th className="border-r border-gray-400 ">Total Fee</th>
                       </>
-                    ) : type === "leads" ?(
+                    ) : type === "leads" ? (
                       <>
                         <th className="border-r border-gray-400 ">
                           Created on
@@ -709,7 +719,7 @@ const DataList = ({ type, items }) => {
                         <th className="border-r border-gray-400 ">Stack</th>
                         <th className="w-50">Course</th>
                       </>
-                    ):(
+                    ) : (
                       <>
                         <th className="border-r border-gray-400 ">
                           Created on
@@ -723,7 +733,6 @@ const DataList = ({ type, items }) => {
                         <th className="w-50">Course</th>
                       </>
                     )}
-
                   </tr>
                 </thead>
                 <tbody className="text-left font-normal">
@@ -737,7 +746,11 @@ const DataList = ({ type, items }) => {
                         className="text-left font-normal"
                         onClick={(e) => e.stopPropagation()}
                       >
-                        <input type="checkbox" className="form-checkbox" onClick={(e) => handleSelectedItems(e, item)} />
+                        <input
+                          type="checkbox"
+                          className="form-checkbox"
+                          onClick={(e) => handleSelectedItems(e, item)}
+                        />
                       </td>
 
                       {type === "courses" ? (
@@ -776,16 +789,10 @@ const DataList = ({ type, items }) => {
                             {item.techStack}
                           </td>
                           <td className="text-left font-normal">
-                            {item.currency}
+                            {item.learnerStage}
                           </td>
                           <td className="text-left font-normal">
                             {item.currency}
-                          </td>
-                          <td className="text-left font-normal">
-                            {item.currency}
-                          </td>
-                          <td className="text-left font-normal">
-                            {item.dueDate}
                           </td>
                         </>
                       ) : type === "leads" ? (
@@ -809,7 +816,7 @@ const DataList = ({ type, items }) => {
                             {item.course}
                           </td>
                         </>
-                      ): (
+                      ) : (
                         <>
                           <td className="text-left font-normal">
                             {item.createdAt}
@@ -830,8 +837,7 @@ const DataList = ({ type, items }) => {
                             {item.course}
                           </td>
                         </>
-                      )
-                    }
+                      )}
                     </tr>
                   ))}
                 </tbody>
@@ -841,64 +847,85 @@ const DataList = ({ type, items }) => {
         ) : (
           <div className="mt-5 px-4 py-0 overflow-x-auto w-full h-full">
             <div className="flex gap-3">
-              {statuses.map(
-                (status) => (
-                  <div key={status} className="h-full grid gap-4">
-                    <div
-                      className={`border-t-4 rounded-t-md h-20 min-w-96 py-3 px-5 ${
-                        status === "notContacted"
-                          ? "bg-green-100 border-t-green-300"
-                          : status === "attempted"
-                          ? "bg-blue-100 border-t-blue-300"
-                          : status === "warmLead"
-                          ? "bg-orange-100 border-t-stone-400"
-                          : status === "coldLead"
-                          ? "bg-indigo-100 border-t-slate-400"
-                          : status === "visited"
-                          ? "bg-green-100 border-t-slate-400"
-                          : status === "visiting"
-                          ? "bg-blue-100 border-t-slate-400"
-                          : status === "demoAttended"
-                          ? "bg-orange-100 border-t-slate-400"
-                          : status === "lostOpportunity"
-                          ? "bg-indigo-100 border-t-slate-400"
-                          : ""
-                      }`}
-                    >
-                      <h3 className="text-base font-semibold">{status}</h3>
-                      <p className="text-sm font-semibold">
-                        ₹ {kanbanDataView?.[status]}
-                        <span className="text-sm font-medium"> Leads</span>
-                      </p>
-                    </div>
-                    <div className="bg-gray-200 h-80 p-2 max-w-96 flex rounded">
-                      <div className="flex flex-col">
-                        {filteredDataList
-                          .filter((item) => (item.leadStatus === status) || (item.opportunityStatus=== status))
-                          .map((item) => (
-                            <div
-                              key={item.id}
-                              className="text-base"
-                              onClick={() => handleRowClick(item.id)}
-                            >
-                              <div className="flex flex-row gap-1">
-                                <p className="flex flex-row">
-                                  Name: <span>{getName(item)}</span>
-                                </p>
-                                <p>
-                                  Phone:<span>{item.phone}</span>
-                                </p>
-                                <p>
-                                  Fee: <span>{item.feeQuoted}</span>/-
-                                </p>
-                              </div>
+              {statuses.map((status) => (
+                <div key={status} className="h-full grid gap-4">
+                  <div
+                    className={`border-t-4 rounded-t-md h-20 min-w-96 py-3 px-5 ${
+                      status === "notContacted"
+                        ? "bg-green-100 border-t-green-300"
+                        : status === "attempted"
+                        ? "bg-blue-100 border-t-blue-300"
+                        : status === "warmLead"
+                        ? "bg-orange-100 border-t-stone-400"
+                        : status === "coldLead"
+                        ? "bg-indigo-100 border-t-slate-400"
+                        : status === "visited"
+                        ? "bg-green-100 border-t-slate-400"
+                        : status === "visiting"
+                        ? "bg-blue-100 border-t-slate-400"
+                        : status === "demoAttended"
+                        ? "bg-orange-100 border-t-slate-400"
+                        : status === "lostOpportunity"
+                        ? "bg-indigo-100 border-t-slate-400"
+                        : status === "upcoming"
+                        ? "bg-green-100 border-t-slate-400"
+                        : status === "ongoing"
+                        ? "bg-blue-100 border-t-slate-400"
+                        : status === "onHold"
+                        ? "bg-orange-100 border-t-slate-400"
+                        : status === "completed"
+                        ? "bg-indigo-100 border-t-slate-400"
+                        : ""
+                    }`}
+                  >
+                    <h3 className="text-base font-semibold">{status}</h3>
+                    <p className="text-sm font-semibold">
+                      ₹ {kanbanDataView?.[status]}
+                      <span className="text-sm font-medium"> Leads</span>
+                    </p>
+                  </div>
+                  <div className="bg-gray-200 h-80 p-2 max-w-96 flex rounded">
+                    <div className="flex flex-col">
+                      {filteredDataList
+                        .filter(
+                          (item) =>
+                            item.leadStatus === status ||
+                            item.opportunityStatus === status ||
+                            item.learnerStage === status
+                        )
+                        .map((item) => (
+                          <div
+                            key={item.id}
+                            className="text-base"
+                            onClick={() => handleRowClick(item.id)}
+                          >
+                            <div className="flex flex-row gap-1">
+                              <p className="flex flex-row">
+                                Name: <span>{getName(item)}</span>
+                              </p>
+                              <p>
+                                Phone:<span>{item.phone}</span>
+                              </p>
+                              {type === "learners" ? (
+                                <>
+                                  <p>
+                                    Total Fee: <span>{item.currency}</span>/-
+                                  </p>
+                                </>
+                              ) : (
+                                <>
+                                  <p>
+                                    Fee: <span>{item.feeQuoted}</span>/-
+                                  </p>
+                                </>
+                              )}
                             </div>
-                          ))}
-                      </div>
+                          </div>
+                        ))}
                     </div>
                   </div>
-                )
-              )}
+                </div>
+              ))}
             </div>
           </div>
         )}
