@@ -176,7 +176,7 @@ console.log('yes');
                 <label className="block text-base font-medium gap-2 text-gray-800 ">CC</label>
                 <input
                   type="text"
-                  className="w-full border-b-2 border-gray-300 p-2 rounded text-base font-medium"
+                  className="w-full border-b-2 border-gray-300 p-2 rounded text-base font-medium focus-visible:outline-none "
                   placeholder=""
                   value={leadsData.cc}
                   name="cc"
@@ -213,7 +213,7 @@ console.log('yes');
                 <label className="block text-sm font-medium">Phone</label>
                 <input
                   type="text"
-                  className="w-full border-b-2 border-gray-300 p-2 rounded"
+                  className="w-full border-b-2 border-gray-300 p-2 rounded text-base font-medium focus-visible:outline-none "
                   placeholder="Enter phone no."
                   value={leadsData.phone}
                   name="phone"
@@ -242,7 +242,7 @@ console.log('yes');
                 <label className="block text-sm font-medium">Email</label>
                 <input
                   type="text"
-                  className="w-full border-b-2 border-gray-300 p-2 rounded"
+                  className="w-full border-b-2 border-gray-300 p-2 rounded text-base font-medium focus-visible:outline-none "
                   placeholder="Enter Email"
                   value={leadsData.email}
                   name="email"
@@ -254,7 +254,7 @@ console.log('yes');
                 <label className="block text-sm font-medium">Course</label>
                 <input
                   type="text"
-                  className="w-full border-b-2 border-gray-300 p-2 rounded"
+                  className="w-full border-b-2 border-gray-300 p-2 rounded text-base font-medium focus-visible:outline-none "
                   placeholder="Enter Course"
                   value={leadsData.course}
                   name="course"
@@ -266,7 +266,7 @@ console.log('yes');
                 <label className="block text-sm font-medium">Fee Quoted</label>
                 <input
                   type="text"
-                  className="w-full border-b-2 border-gray-300 p-2 rounded"
+                  className="w-full border-b-2 border-gray-300 p-2 rounded text-base font-medium focus-visible:outline-none "
                   placeholder="Enter Fee quoted"
                   value={leadsData.fee}
                   name="fee"
@@ -298,7 +298,7 @@ console.log('yes');
                 </label>
                 <input
                   type="text"
-                  className="w-full border-b-2 border-gray-300 p-2 rounded"
+                  className="w-full border-b-2 border-gray-300 p-2 rounded text-base font-medium focus-visible:outline-none "
                   placeholder="Select timing"
                   value={leadsData.time}
                   name="time"
@@ -312,7 +312,7 @@ console.log('yes');
                 </label>
                 <input
                   type="datetime-local"
-                  className="w-full border-b-2 border-gray-300 p-2 rounded"
+                  className="w-full border-b-2 border-gray-300 p-2 rounded text-base font-medium focus-visible:outline-none "
                   placeholder="Select next followup"
                   value={leadsData.nextFollowUp}
                   name="nextFollowUp"
@@ -324,7 +324,7 @@ console.log('yes');
                 <label className="block text-sm font-medium">Description</label>
                 <input
                   type="text"
-                  className="w-full border-b-2 border-gray-300 p-2 rounded"
+                  className="w-full border-b-2 border-gray-300 p-2 rounded text-base font-medium focus-visible:outline-none "
                   placeholder="Description"
                   value={leadsData.description}
                   name="description"
@@ -344,7 +344,7 @@ console.log('yes');
                 </label>
                 <input
                   type="text"
-                  className="w-full border-b-2 border-gray-300 p-2 rounded text-base font-medium"
+                  className="w-full border-b-2 border-gray-300 p-2 rounded text-base font-medium focus-visible:outline-none "
                   placeholder="Name"
                   value={opportunitiesData.name}
                   name="name"
@@ -376,7 +376,7 @@ console.log('yes');
                 </label>
                 <input
                   type="text"
-                  className="w-full border-b-2 border-gray-300 p-2 rounded text-base font-medium"
+                  className="w-full border-b-2 border-gray-300 p-2 rounded text-base font-medium focus-visible:outline-none "
                   placeholder="CC"
                   value={opportunitiesData.cc}
                   name="cc"
@@ -422,7 +422,7 @@ console.log('yes');
                 </label>
                 <input
                   type="text"
-                  className="w-full border-b-2 border-gray-300 p-2 rounded text-base font-medium"
+                  className="w-full border-b-2 border-gray-300 p-2 rounded text-base font-medium focus-visible:outline-none"
                   placeholder="Phone"
                   value={opportunitiesData.phone}
                   name="phone"
@@ -466,7 +466,7 @@ console.log('yes');
                 </label>
                 <input
                   type="text"
-                  className="w-full border-b-2 border-gray-300 p-2 rounded text-base font-medium"
+                  className="w-full border-b-2 border-gray-300 p-2 rounded text-base font-medium focus-visible:outline-none"
                   placeholder="Email"
                   value={opportunitiesData.email}
                   name="email"
@@ -509,7 +509,7 @@ console.log('yes');
                 </label>
                 <input
                   type="text"
-                  className="w-full border-b-2 border-gray-300 p-2 rounded text-base font-medium"
+                  className="w-full border-b-2 border-gray-300 p-2 rounded text-base font-medium focus-visible:outline-none"
                   placeholder="Select Fee Quoted"
                   value={opportunitiesData.feeQuoted}
                   name="feeQuoted"
@@ -545,7 +545,7 @@ console.log('yes');
                 </label>
                 <input
                   type="text"
-                  className="w-full border-b-2 border-gray-300 p-2 rounded text-base font-medium"
+                  className="w-full border-b-2 border-gray-300 p-2 rounded text-base font-medium focus-visible:outline-none"
                   placeholder="Batch Timing"
                   value={opportunitiesData.batchTiming}
                   name="batchTiming"
@@ -559,7 +559,7 @@ console.log('yes');
                 </label>
                 <input
                   type="datetime-local"
-                  className="w-full border-b-2 border-gray-300 p-2 rounded text-base font-medium"
+                  className="w-full border-b-2 border-gray-300 p-2 rounded text-base font-medium focus-visible:outline-none"
                   placeholder="Next Follow Up"
                   value={opportunitiesData.nextFollowUp}
                   name="nextFollowUp"
@@ -640,7 +640,7 @@ console.log('yes');
                 </label>
                 <input
                   type="text"
-                  className="w-full border-b-2 border-gray-300 p-2 rounded text-base font-medium"
+                  className="w-full border-b-2 border-gray-300 p-2 rounded text-base font-medium focus-visible:outline-none"
                   placeholder="course"
                   value={opportunitiesData.course}
                   name="course"
@@ -674,7 +674,7 @@ console.log('yes');
                 </label>
                 <input
                   type="text"
-                  className="w-full border-b-2 border-gray-300 p-2 rounded text-base font-medium"
+                  className="w-full border-b-2 border-gray-300 p-2 rounded text-base font-medium focus-visible:outline-none"
                   placeholder="Description"
                   value={opportunitiesData.description}
                   name="description"
@@ -694,7 +694,7 @@ console.log('yes');
                 </label>
                 <input
                   type="text"
-                  className="w-full border-b-2 border-gray-300 p-2 rounded text-base font-medium"
+                  className="w-full border-b-2 border-gray-300 p-2 rounded text-base font-medium focus-visible:outline-none"
                   placeholder="First Name"
                   value={learnersData.firstname}
                   name="firstname"
@@ -706,7 +706,7 @@ console.log('yes');
                 <label className="block text-base font-medium gap-2 text-gray-800 ">Last Name</label>
                 <input
                   type="text"
-                  className="w-full border-b-2 border-gray-300 p-2 rounded text-base font-medium"
+                  className="w-full border-b-2 border-gray-300 p-2 rounded text-base font-medium focus-visible:outline-none"
                   placeholder="Last Name"
                   value={learnersData.lastname}
                   name="lastname"
@@ -720,7 +720,7 @@ console.log('yes');
                 </label>
                 <input
                   type="text"
-                  className="w-full border-b-2 border-gray-300 p-2 rounded text-base font-medium"
+                  className="w-full border-b-2 border-gray-300 p-2 rounded text-base font-medium focus-visible:outline-none"
                   placeholder="Id Proof"
                   value={learnersData.idProof}
                   name="idProof"
@@ -734,7 +734,7 @@ console.log('yes');
                 </label>
                 <input
                   type="text"
-                  className="w-full border-b-2 border-gray-300 p-2 rounded text-base font-medium"
+                  className="w-full border-b-2 border-gray-300 p-2 rounded text-base font-medium focus-visible:outline-none"
                   placeholder="Phone"
                   value={learnersData.phone}
                   name="phone"
@@ -748,7 +748,7 @@ console.log('yes');
                 </label>
                 <input
                   type="date"
-                  className="w-full border-b-2 border-gray-300 p-2 rounded text-base font-medium"
+                  className="w-full border-b-2 border-gray-300 p-2 rounded text-base font-medium focus-visible:outline-none"
                   placeholder="DOB"
                   value={learnersData.DOB}
                   name="DOB"
@@ -762,7 +762,7 @@ console.log('yes');
                 </label>
                 <input
                   type="email"
-                  className="w-full border-b-2 border-gray-300 p-2 rounded text-base font-medium"
+                  className="w-full border-b-2 border-gray-300 p-2 rounded text-base font-medium focus-visible:outline-none"
                   placeholder="Email"
                   value={learnersData.email}
                   name="email"
@@ -776,7 +776,7 @@ console.log('yes');
                 </label>
                 <input
                   type="date"
-                  className="w-full border-b-2 border-gray-300 p-2 rounded text-base font-medium"
+                  className="w-full border-b-2 border-gray-300 p-2 rounded text-base font-medium focus-visible:outline-none"
                   placeholder="registered Date"
                   value={learnersData.registeredDate}
                   name="registeredDate"
@@ -806,7 +806,7 @@ console.log('yes');
                 </label>
                 <input
                   type="text"
-                  className="w-full border-b-2 border-gray-300 p-2 rounded text-base font-medium"
+                  className="w-full border-b-2 border-gray-300 p-2 rounded text-base font-medium focus-visible:outline-none"
                   placeholder="Batch Id"
                   value={learnersData.batchId}
                   name="batchId"
@@ -820,7 +820,7 @@ console.log('yes');
                 </label>
                 <input
                   type="text"
-                  className="w-full border-b-2 border-gray-300 p-2 rounded text-base font-medium"
+                  className="w-full border-b-2 border-gray-300 p-2 rounded text-base font-medium focus-visible:outline-none"
                   placeholder="Alternate Phone"
                   value={learnersData.alternatePhone}
                   name="alternatePhone"
@@ -834,7 +834,7 @@ console.log('yes');
                 </label>
                 <input
                   type="text"
-                  className="w-full border-b-2 border-gray-300 p-2 rounded text-base font-medium"
+                  className="w-full border-b-2 border-gray-300 p-2 rounded text-base font-medium focus-visible:outline-none"
                   placeholder="Description"
                   value={learnersData.description}
                   name="description"
@@ -848,7 +848,7 @@ console.log('yes');
                 </label>
                 <input
                   type="text"
-                  className="w-full border-b-2 border-gray-300 p-2 rounded text-base font-medium"
+                  className="w-full border-b-2 border-gray-300 p-2 rounded text-base font-medium focus-visible:outline-none"
                   placeholder="Exchange Rate"
                   value={learnersData.exchangeRate}
                   name="exchangeRate"
@@ -862,7 +862,7 @@ console.log('yes');
                 </label>
                 <input
                   type="text"
-                  className="w-full border-b-2 border-gray-300 p-2 rounded text-base font-medium"
+                  className="w-full border-b-2 border-gray-300 p-2 rounded text-base font-medium focus-visible:outline-none"
                   placeholder="Source"
                   value={learnersData.source}
                   name="source"
@@ -906,7 +906,7 @@ console.log('yes');
                 </label>
                 <input
                   type="text"
-                  className="w-full border-b-2 border-gray-300 p-2 rounded text-base font-medium"
+                  className="w-full border-b-2 border-gray-300 p-2 rounded text-base font-medium focus-visible:outline-none"
                   placeholder="Learner Owner"
                   value={learnersData.learnerOwner}
                   name="learnerOwner"
@@ -941,7 +941,7 @@ console.log('yes');
                 </label>
                 <input
                   type="text"
-                  className="w-full border-b-2 border-gray-300 p-2 rounded text-base font-medium"
+                  className="w-full border-b-2 border-gray-300 p-2 rounded text-base font-medium focus-visible:outline-none"
                   placeholder="Currency"
                   value={learnersData.currency}
                   name="currency"
@@ -955,7 +955,7 @@ console.log('yes');
                 </label>
                 <input
                   type="date"
-                  className="w-full border-b-2 border-gray-300 p-2 text-gray-800"
+                  className="w-full border-b-2 border-gray-300 p-2 rounded text-base font-medium focus-visible:outline-none"
                   placeholder="lead Created Date"
                   value={learnersData.leadCreatedDate}
                   name="leadCreatedDate"
@@ -969,7 +969,7 @@ console.log('yes');
                 </label>
                 <input
                   type="text"
-                  className="w-full border-b-2 border-gray-300 p-2 rounded text-base font-medium"
+                  className="w-full border-b-2 border-gray-300 p-2 rounded text-base font-medium focus-visible:outline-none"
                   placeholder="Counselling Done By"
                   value={learnersData.CounselingDoneBy}
                   name="CounselingDoneBy"
@@ -986,7 +986,7 @@ console.log('yes');
                 </label>
                 <input
                   type="text"
-                  className="w-full border-b-2 border-gray-300 p-2 rounded text-base font-medium"
+                  className="w-full border-b-2 border-gray-300 p-2 rounded text-base font-medium focus-visible:outline-none"
                   placeholder="Registered Course"
                   value={learnersData.registeredCourse}
                   name="registeredCourse"
@@ -1000,7 +1000,7 @@ console.log('yes');
                 </label>
                 <input
                   type="time"
-                  className="w-full border-b-2 border-gray-300 p-2 rounded text-base font-medium"
+                  className="w-full border-b-2 border-gray-300 p-2 rounded text-base font-medium focus-visible:outline-none"
                   placeholder="Preferable Time"
                   value={learnersData.preferableTime}
                   name="preferableTime"
@@ -1014,7 +1014,7 @@ console.log('yes');
                 </label>
                 <input
                   type="text"
-                  className="w-full border-b-2 border-gray-300 p-2 rounded text-base font-medium"
+                  className="w-full border-b-2 border-gray-300 p-2 rounded text-base font-medium focus-visible:outline-none"
                   placeholder="Tech Stack"
                   value={learnersData.techStack}
                   name="techStack"
@@ -1028,7 +1028,7 @@ console.log('yes');
                 </label>
                 <input
                   type="datet"
-                  className="w-full border-b-2 border-gray-300 p-2 rounded text-base font-medium"
+                  className="w-full border-b-2 border-gray-300 p-2 rounded text-base font-medium focus-visible:outline-none"
                   placeholder="Batch Timing"
                   value={learnersData.batchTiming}
                   name="batchTiming"
@@ -1042,7 +1042,7 @@ console.log('yes');
                 </label>
                 <input
                   type="text"
-                  className="w-full border-b-2 border-gray-300 p-2 rounded text-base font-medium"
+                  className="w-full border-b-2 border-gray-300 p-2 rounded text-base font-medium focus-visible:outline-none"
                   placeholder="Course Comments"
                   value={learnersData.courseComments}
                   name="courseComments"
@@ -1073,7 +1073,7 @@ console.log('yes');
                 </label>
                 <input
                   type="text"
-                  className="w-full border-b-2 border-gray-300 p-2 rounded text-base font-medium"
+                  className="w-full border-b-2 border-gray-300 p-2 rounded text-base font-medium focus-visible:outline-none"
                   placeholder="Slack Access"
                   value={learnersData.slackAccess}
                   name="slackAccess"
@@ -1087,7 +1087,7 @@ console.log('yes');
                 </label>
                 <input
                   type="text"
-                  className="w-full border-b-2 border-gray-300 p-2 rounded text-base font-medium"
+                  className="w-full border-b-2 border-gray-300 p-2 rounded text-base font-medium focus-visible:outline-none"
                   placeholder="Comment"
                   value={learnersData.Comment}
                   name="Comment"
@@ -1101,7 +1101,7 @@ console.log('yes');
                 </label>
                 <input
                   type="text"
-                  className="w-full border-b-2 border-gray-300 p-2 rounded text-base font-medium"
+                  className="w-full border-b-2 border-gray-300 p-2 rounded text-base font-medium focus-visible:outline-none"
                   placeholder="LMS Access"
                   value={learnersData.lMSAccess}
                   name="lMSAccess"
@@ -1119,7 +1119,7 @@ console.log('yes');
                 <label className="block text-sm font-medium">Course Name</label>
                 <input
                   type="text"
-                  className="w-full border border-gray-300 p-2 rounded"
+                  className="w-full border-b-2 border-gray-300 p-2 rounded text-base font-medium focus-visible:outline-none"
                   placeholder="Enter course name"
                   name="courseName"
                   value={coursesData.courseName}
@@ -1130,7 +1130,7 @@ console.log('yes');
               <div className="mb-4">
                 <label className="block text-sm font-medium">Description</label>
                 <textarea
-                  className="w-full border border-gray-300 p-2 rounded"
+                  className="w-full border-b-2 border-gray-300 p-2 rounded text-base font-medium focus-visible:outline-none "
                   placeholder="Enter course description"
                   value={coursesData.description}
                 onChange={handleChange}
@@ -1141,7 +1141,7 @@ console.log('yes');
                 <label className="block text-sm font-medium">Course Fee</label>
                 <input
                   type="number"
-                  className="w-full border border-gray-300 p-2 rounded"
+                  className="w-full border-b-2 border-gray-300 p-2 rounded text-base font-medium focus-visible:outline-none "
                   placeholder="Enter course fee"
                   value={coursesData.courseFee}
                 onChange={handleChange}
@@ -1169,7 +1169,6 @@ console.log('yes');
               </button>
             </div>
           </div>
-        
       </div>
     </div>
   );

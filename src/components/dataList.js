@@ -31,7 +31,7 @@ import {
 } from "@/slices/learnersSlice";
 
 const DataList = ({ type, items }) => {
-  const ITEMS_PER_PAGE = 10;
+  const ITEMS_PER_PAGE = 15;
   // const [dataList, setDataList] = useState(initialData[type] || []);
   const [searchQuery, setSearchQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
@@ -132,10 +132,12 @@ const DataList = ({ type, items }) => {
     setIsActionOpen(false);
   };
 
-  const handleCurrentDataList = (filteredList) => {
+  const handleCurrentDataList = (filteredList, page) => {
+    console.log(currentPage);
+    const selectedPage = page ?? currentPage;
     const currentDataList = filteredList?.slice(
-      (currentPage - 1) * ITEMS_PER_PAGE,
-      currentPage * ITEMS_PER_PAGE
+      (selectedPage - 1) * ITEMS_PER_PAGE,
+      selectedPage * ITEMS_PER_PAGE
     );
     setFilteredDataList(currentDataList ?? []);
   };
@@ -193,9 +195,9 @@ const DataList = ({ type, items }) => {
         break;
     }
 
-    // handleCurrentDataList(filteredItems);
+    handleCurrentDataList(filteredItems);
 
-    setFilteredDataList(filteredItems);
+    // setFilteredDataList(filteredItems);
   };
 
   useMemo(
@@ -268,9 +270,9 @@ const DataList = ({ type, items }) => {
     setKanbanDataView(kanbanView);
     setTotalItems(totalItems);
     setTotalPages(totalPages);
-    // handleCurrentDataList([...filterDataList]);
+    handleCurrentDataList([...(filterDataList ?? [])]);
 
-    setFilteredDataList(filterDataList ?? []);
+    // setFilteredDataList(filterDataList ?? []);
   }, [dataList]);
 
   // const totalItems = filteredDataList?.length;
@@ -291,14 +293,14 @@ const DataList = ({ type, items }) => {
     );
 
     setSearchQuery(searchQuery);
-    // handleCurrentDataList(filterDataList);
-    setFilteredDataList(filterDataList ?? []);
+    handleCurrentDataList(filterDataList);
+    // setFilteredDataList(filterDataList ?? []);
   };
 
   const handlePageChange = (page) => {
     if (page >= 1 && page <= totalPages) {
       setCurrentPage(page);
-      // handleCurrentDataList(dataList);
+      handleCurrentDataList(dataList, page);
     }
   };
 
@@ -396,9 +398,9 @@ const DataList = ({ type, items }) => {
       setSelectedStatus(status);
     }
 
-    // handleCurrentDataList(filterDataList);
+    handleCurrentDataList(filterDataList);
 
-    setFilteredDataList(filterDataList ?? []);
+    // setFilteredDataList(filterDataList ?? []);
   };
 
   const handleSelectedItems = (e, item) => {

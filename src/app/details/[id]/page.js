@@ -850,7 +850,7 @@ const DetailPage = () => {
                       <input
                         type="text"
                         className="w-full border-b-2 border-gray-300 p-2 rounded text-base font-medium"
-                        placeholder="Enter name"
+                        placeholder=""
                         value={item.name?.value}
                         onChange={(e) => handleChange(e)}
                         disabled={!item.name?.editEnabled}
