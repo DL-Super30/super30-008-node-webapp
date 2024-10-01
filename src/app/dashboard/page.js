@@ -261,11 +261,13 @@ export default function Dashboard() {
             <Line data={leadLineChartData} options={leadOptions} />
           )}
         </div>
-        <div className="w-1/2 flex flex-col gap-2 items-center justify-items-center p-4 w-80 h-80">
-        <h3 className="flex text-xl font-semibold text-violet-900">TotalLeads-<p>{totalLeads}</p></h3>
+        <div className="w-1/2 flex justify-center p-4">
+        <div className=" flex flex-col gap-2 items-center justify-center w-80 h-80">
+        <h3 className="flex text-2xl font-semibold text-violet-900 text-center">TotalLeads-<p>{totalLeads}</p></h3>
           {leadPieChartData && (
             <Pie className="w-24 h-24" data={leadPieChartData} options={{}} />
           )}
+        </div>
         </div>
       </div>
     </div>
