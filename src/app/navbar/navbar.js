@@ -51,11 +51,11 @@ export default function Navbar() {
             <button>
               <Link href="/dashboard">
                 <Image
-                  src="/images/skillcaplogo"
+                 src="/images/skillcaplogo.png"
                   alt="skillcaplogo"
                   width={305}
                   height={40}
-                  className="inline-block pb-1"
+                  className="inline-block pb-1 w-80 h-10"
                 />
               </Link>
             </button>
