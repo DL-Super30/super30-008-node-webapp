@@ -9,6 +9,8 @@ import {
   getLeadsApi,
   updateLeadsApi,
 } from "@/slices/leadsSlice";
+import { getOpportunityApi } from "@/slices/opportunitiesSlice";
+import { getlearnerApi } from "@/slices/learnersSlice";
 
 const DetailPage = () => {
   const router = useRouter();
@@ -16,7 +18,7 @@ const DetailPage = () => {
   const queryParams = useSearchParams();
   const type = queryParams.get("type");
   const [item, setItem] = useState(null);
-  const dataList = useSelector((state) => state.leads.leads);
+  const dataList = useSelector((state) => state?.[type]?.[type]);
   const dispatch = useDispatch();
 
   console.log(params, queryParams.get("type"));
@@ -24,10 +26,17 @@ const DetailPage = () => {
   useEffect(() => {
     if (!type || !params.id) return;
 
-    dispatch(getLeadsApi());
+    if (type === "leads") {
+      dispatch(getLeadsApi());
+    } else if (type === "opportunities") {
+      dispatch(getOpportunityApi());
+    } else if (type === "learners") {
+      dispatch(getlearnerApi());
+    }
   }, [type, params.id]);
 
   useEffect(() => {
+    console.log(dataList);
     const foundItem = dataList.find((data) => data.id === Number(params.id));
     console.log(foundItem);
     const itemNeedToBeAdded = {};
@@ -3236,12 +3245,6 @@ const DetailPage = () => {
                     {item?.courseName?.value}
                   </h1>
                 </div>
-
-                <div className="mx-3 ">
-                  <button className="text-base bg-cyan-500 text-center px-3 py-1 border rounded-md">
-                    Convert
-                  </button>
-                </div>
               </div>
 
               <div className="flex justify-between mx-5 mt-2">
@@ -3394,7 +3397,6 @@ const DetailPage = () => {
                   </div>
                 </div>
               </div>
-
             </div>
           </div>
         </>
