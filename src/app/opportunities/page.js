@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useCallback } from "react";
 import axios from "axios";
 import { useRouter } from "next/navigation";
 import CreateOpportunityModal from "../components/createOpportunity";
@@ -39,17 +39,16 @@ export default function Opportunities() {
     }
   }, [router]);
 
-  useEffect(() => {
-    fetchLeads();
-  }, []);
+  
   const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
-  const fetchLeads = async () => {
+  const fetchLeads = useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
       const response = await axios.get(`${API_BASE_URL}/opportunity`);
       if (response.data && Array.isArray(response.data.data)) {
+        // Sort the leads by id in descending order
         const sortedLeads = response.data.data.sort((a, b) => b.id - a.id);
         setAllLeads(sortedLeads);
       } else {
@@ -60,7 +59,12 @@ export default function Opportunities() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [API_BASE_URL]); // Dependency array with API_BASE_URL
+
+  // Fetch leads on component mount
+  useEffect(() => {
+    fetchLeads();
+  }, [fetchLeads]);
 
   const filteredLeads = useMemo(() => {
     let filtered = [...allLeads];
@@ -112,32 +116,32 @@ export default function Opportunities() {
     );
   };
 
-  const handleUpdateClick = () => {
-    if (selectedLeads.length === 0) {
-      toast.warn('Please select at least one opportunity to update!', {
-        position: "top-center",
-        autoClose: 3000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        theme: "colored",
-      });
-    } else if (selectedLeads.length === 1) {
+  const handleUpdateClick = (leadId = null) => {
+    // Case 1: If leadId is passed (from row click)
+    if (leadId) {
+      const lead = allLeads.find((lead) => lead.id === leadId);
+      if (lead) {
+        dispatch(openModal(lead)); // Open modal with selected lead's data
+      }
+    }
+    // Case 2: If selected leads (from checkbox selection)
+    else if (selectedLeads.length === 1) {
       const lead = allLeads.find((lead) => lead.id === selectedLeads[0]);
       if (lead) {
-        dispatch(openModal(lead));
+        dispatch(openModal(lead)); // Open modal with selected lead's data
       }
-    } else {
-      toast.error('Please select only one opportunity to update at a time.', {
+    } 
+    // Case 3: Handle other cases (0 or multiple selections)
+    else if (selectedLeads.length === 0) {
+      toast.warn('Please select at least one lead to update!', {
         position: "top-center",
         autoClose: 3000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
+        theme: "colored",
+      });
+    } else {
+      toast.error('Please select only one lead to update at a time.', {
+        position: "top-center",
+        autoClose: 3000,
         theme: "colored",
       });
     }
@@ -273,7 +277,7 @@ export default function Opportunities() {
             </div>
             {isActionsDropdownOpen && (
               <ul className="absolute top-full mt-1 bg-white shadow-lg rounded-lg z-40 w-full sm:w-auto">
-                <li className="px-4 py-2 hover:bg-teal-100 cursor-pointer" onClick={handleUpdateClick}>Update</li>
+                <li className="px-4 py-2 hover:bg-teal-100 cursor-pointer" onClick={()=>handleUpdateClick()}>Update</li>
                 <li className="px-4 py-2 hover:bg-teal-100 cursor-pointer" onClick={handleDeleteClick}>Delete</li>
               </ul>
             )}
@@ -378,12 +382,15 @@ export default function Opportunities() {
                 </tr>
               ) : (
                 paginatedLeads.map((lead) => (
-                  <tr key={lead.id} className="border-b border-b-teal-100">
-                    <td className="p-2 text-center">
+                  <tr key={lead.id} className="border-b border-b-teal-100 cursor-pointer" onClick={() => handleUpdateClick(lead.id)}>
+                    <td className="p-2 text-center" onClick={(e) => e.stopPropagation()}>
                       <input
                         type="checkbox"
                         checked={selectedLeads.includes(lead.id)}
-                        onChange={() => handleCheckboxChange(lead.id)}
+                        onChange={(e) => {
+                          e.stopPropagation(); // Prevent row click when checkbox is changed
+                          handleCheckboxChange(lead.id); // Update selected leads on checkbox change
+                        }}
                       />
                     </td>
                     <td className="p-2 text-center">{formatDate(lead.createdAt)}</td>

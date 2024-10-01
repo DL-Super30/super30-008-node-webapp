@@ -1,19 +1,15 @@
-'use client'
+"use client"
 
-import { useState, useEffect } from "react"
-import { useDispatch, useSelector } from "react-redux"
-import axios from "axios"
-import { closeModal } from "../components/modalSlice" // Import closeModal action
+import React, { useState, useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { closeModal } from "../components/modalSlice";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
-export default function UpdateModal() {
-  const dispatch = useDispatch()
-  const [successMessage, setSuccessMessage] = useState("")
-  const [error, setError] = useState("")
-  const { isModalOpen, selectedLead } = useSelector((state) => state.modal) // Get modal state
-
-  // Local state to store updated lead data
+export default function LeadUpdateModal() {
+  const dispatch = useDispatch();
+  const { isModalOpen, selectedLead } = useSelector((state) => state.modal);
+  const [editingFields, setEditingFields] = useState({});
   const [leadData, setLeadData] = useState({
     leadname: "",
     email: "",
@@ -24,9 +20,8 @@ export default function UpdateModal() {
     leadSource: "",
     course: "",
     selectedClassMode: "",
-  })
+  });
 
-  // Use useEffect to update leadData when selectedLead changes
   useEffect(() => {
     if (selectedLead) {
       setLeadData({
@@ -39,59 +34,38 @@ export default function UpdateModal() {
         leadSource: selectedLead.leadSource || "",
         course: selectedLead.course || "",
         selectedClassMode: selectedLead.selectedClassMode || "",
-      })
+      });
+      setEditingFields({});
     }
-  }, [selectedLead]) // Update leadData whenever selectedLead changes
+  }, [selectedLead]);
 
-  // Function to generate time options
-  const generateTimeOptions = (startTime, endTime) => {
-    const times = [];
-    let current = startTime;
-
-    while (current <= endTime) {
-      const hours = current.getHours();
-      const minutes = current.getMinutes() === 0 ? '00' : current.getMinutes();
-      const period = hours >= 12 ? 'PM' : 'AM';
-      const formattedHours = hours % 12 === 0 ? 12 : hours % 12;
-
-      times.push(
-        `${formattedHours}:${minutes} ${period}`
-      );
-
-      // Increment by 1 hour
-      current.setHours(current.getHours() + 1);
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    if (editingFields[name]) {
+      setLeadData({ ...leadData, [name]: name === 'feeQuoted' ? Number(value) : value });
     }
-
-    return times;
   };
 
-  // Usage in the JSX
-  const timeOptions = generateTimeOptions(new Date(2024, 1, 1, 7, 0), new Date(2024, 1, 1, 21, 0)); // 7:00 AM to 9:00 PM
-
-  // Handle input changes
-  const handleInputChange = (e) => {
-    const { name, value } = e.target
-    setLeadData({ ...leadData, [name]: name === 'feeQuoted' ? Number(value) : value })
-  }
-
-  // Handle closing the modal
   const handleClose = () => {
-    dispatch(closeModal())
-  }
+    dispatch(closeModal());
+  };
+
   const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
-  // Handle form submission to update the lead
+  // Function to handle full form submission (PUT request)
   const handleSubmit = async (e) => {
-    e.preventDefault()
+    e.preventDefault();
 
     try {
-      // Make the API call to update the lead
-      const response = await axios.put(`${API_BASE_URL}/leads/${selectedLead.id}`, leadData)
+      const response = await fetch(`${API_BASE_URL}/leads/${selectedLead.id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(leadData),
+      });
 
-      if (response.status === 200) {
-        // Successfully updated the lead
-        setSuccessMessage("Lead updated successfully!") // Set success message
-        setError("") // Clear error message if any
+      if (response.ok) {
         toast.success('Lead updated successfully!', {
           position: "top-center",
           autoClose: 2000,
@@ -101,18 +75,13 @@ export default function UpdateModal() {
           draggable: true,
           progress: undefined,
           theme: "colored",
-          // transition: Bounce,
         });
 
-        // Reload the page to reflect the updated data
         setTimeout(() => {
-          handleClose() // Close the modal
-          window.location.reload() // Refresh the page
-        }, 2000) // Delay to show success message
-
+          handleClose();
+          window.location.reload();
+        }, 2000);
       } else {
-        setSuccessMessage("") // Clear success message if there's an error
-        setError("Failed to update lead.")
         toast.warn('Failed to update lead.', {
           position: "top-center",
           autoClose: 2000,
@@ -122,13 +91,10 @@ export default function UpdateModal() {
           draggable: true,
           progress: undefined,
           theme: "colored",
-          // transition: Bounce,
         });
       }
     } catch (error) {
-      console.error("Error updating lead:", error)
-      setSuccessMessage("") // Clear success message if there's an error
-      setError("An error occurred while updating the lead.")
+      console.error("Error updating lead:", error);
       toast.error('An error occurred while updating the lead.', {
         position: "top-center",
         autoClose: 2000,
@@ -138,231 +104,166 @@ export default function UpdateModal() {
         draggable: true,
         progress: undefined,
         theme: "colored",
-        // transition: Bounce,
       });
     }
-  }
+  };
+
+  // Function to handle partial updates (PATCH request)
+  const handlePatch = async (e, fieldKey) => {
+    e.preventDefault();
+
+    const updatedField = {
+      [fieldKey]: leadData[fieldKey]
+    };
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/leads/${selectedLead.id}`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(updatedField),
+      });
+
+      if (response.ok) {
+        toast.success(`${fieldKey} updated successfully!`, {
+          position: "top-center",
+          autoClose: 2000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "colored",
+        });
+
+        setEditingFields((prev) => ({ ...prev, [fieldKey]: false }));
+      } else {
+        toast.warn(`Failed to update ${fieldKey}.`, {
+          position: "top-center",
+          autoClose: 2000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "colored",
+        });
+      }
+    } catch (error) {
+      console.error(`Error updating ${fieldKey}:`, error);
+      toast.error(`An error occurred while updating ${fieldKey}.`, {
+        position: "top-center",
+        autoClose: 2000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "colored",
+      });
+    }
+  };
+
+  const toggleEditing = (key) => {
+    setEditingFields(prev => ({ ...prev, [key]: !prev[key] }));
+  };
+
+  const isAnyFieldEditing = Object.values(editingFields).some(value => value);
 
   if (!isModalOpen) {
-    return null // Don't render the modal if it's not open
+    return null;
   }
-  const handleKeyDown = (e) => {
-    if (e.key === 'Enter') {
-      e.preventDefault()
-      handleSubmit(e)
-    }
-  }
+
+  const renderField = (key, label, options = null) => (
+    <div key={key} className="mb-4">
+      <label htmlFor={key} className="block text-sm font-medium text-gray-700">{label}</label>
+      <div className="flex items-center mt-1">
+        {options ? (
+          <select
+            id={key}
+            name={key}
+            value={leadData[key]}
+            onChange={handleInputChange}
+            disabled={!editingFields[key]}
+            className={`w-full p-2 border rounded-md ${editingFields[key] ? 'border-teal-500' : 'bg-gray-100 border-gray-300'}`}
+          >
+            <option value="">Select {label}</option>
+            {options.map((option, index) => (
+              <option key={index} value={option}>{option}</option>
+            ))}
+          </select>
+        ) : (
+          <input
+            type={key === 'feeQuoted' ? 'number' : 'text'}
+            id={key}
+            name={key}
+            value={leadData[key]}
+            onChange={handleInputChange}
+            disabled={!editingFields[key]}
+            className={`w-full p-2 border rounded-md ${editingFields[key] ? 'border-teal-500' : 'bg-gray-100 border-gray-300'}`}
+          />
+        )}
+        <button
+          type="button"
+          className="ml-2 p-1 text-gray-500 hover:text-teal-500"
+          onClick={(e) => {
+            if (editingFields[key]) {
+              handlePatch(e, key);
+            } else {
+              toggleEditing(key);
+            }
+          }}
+        >
+          <span className="material-icons">
+            {editingFields[key] ? 'save' : 'edit'}
+          </span>
+        </button>
+      </div>
+    </div>
+  );
+
+  const leadStatusOptions = ["Not Contacted", "Attempted", "Warm Lead", "Cold Lead"];
+  const leadSourceOptions = ["None", "Walk-In", "Student Referral", "Demo", "Website", "Website Chat", "Inbound Call", "Google Adverts", "Facebook Ads", "Google Business", "WhatsApp Skill Capital"];
+  const courseOptions = ["HR Business Partner", "HR Generalist", "HR Analytics", "Spoken English", "Public Speaking", "Communication Skills", "Soft Skills", "Aptitude", "IELTS", "TOEFL", "GRE", "JFS", "PFS", "MERN", "AWS+DevOps", "Azure+DevOps", "Java Full Stack", "Python Full Stack"];
+  const classModeOptions = ["International Online", "India Online", "BLR Classroom", "HYD Classroom"];
 
   return (
-    <div className="modal fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50">
+    <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50">
       <ToastContainer />
-      <div className="bg-white p-6 rounded-lg shadow-lg max-w-5xl w-full h-full sm:h-auto max-h-[90vh] overflow-y-auto relative">
-        <div className="flex items-center mb-6 gap-x-4">
-          <h2 className="text-xl font-bold text-teal-500">Update Lead: </h2>
-          {/* <div className="flex items-center border-2 p-2 pr-2 rounded border-blue-200">
-            <span className="material-icons text-black pr-2">article</span>
-            <span className="text-lg text-black italic font-medium">{leadData.leadname}</span>
-          </div> */}
-          {/* <div className="flex-grow"></div> {/* This will push the button to the right */}
-          {/* <button className="border-amber-400 border-2 text-black p-2 font-bold rounded hover:text-white hover:bg-amber-400">Convert</button>  */}
-        </div>
-
-        {successMessage && <p className="text-green-500">{successMessage}</p>}
-        {error && <p className="text-red-500">{error}</p>}
-        {selectedLead ? (
-          <form onSubmit={handleSubmit} onKeyDown={handleKeyDown}>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 relative">
-              <div className="relative">
-                <label className="block text-gray-700" htmlFor="leadname">
-                  Lead Name
-                </label>
-                <input
-                  type="text"
-                  id="leadname"
-                  name="leadname"
-                  value={leadData.leadname}
-                  onChange={handleInputChange}
-                  className="border w-full p-2 border-gray-300 rounded"
-                />
-              </div>
-
-              <div className="relative">
-                <label className="block text-sm font-medium mb-1" htmlFor="email">
-                  Email
-                </label>
-                <input
-                  type="email"
-                  id="email"
-                  name="email"
-                  value={leadData.email}
-                  onChange={handleInputChange}
-                  className="w-full p-2 border border-gray-300 rounded"
-                />
-              </div>
-
-              <div className="relative">
-                <label className="block text-sm font-medium mb-1" htmlFor="phone">
-                  Phone
-                </label>
-                <input
-                  type="text"
-                  id="phone"
-                  name="phone"
-                  value={leadData.phone}
-                  onChange={handleInputChange}
-                  className="w-full p-2 border border-gray-300 rounded"
-                />
-              </div>
-
-              <div className="relative">
-                <label className="block text-sm font-medium mb-1" htmlFor="feeQuoted">
-                  Fee Quoted
-                </label>
-                <input
-                  type="number"
-                  id="feeQuoted"
-                  name="feeQuoted"
-                  value={leadData.feeQuoted}
-                  onChange={handleInputChange}
-                  className="w-full p-2 border border-gray-300 rounded"
-                />
-              </div>
-
-              <div className="relative">
-                <label className="block text-sm font-medium mb-1" htmlFor="batchTiming">
-                  Batch Timing
-                </label>
-                <select
-                  id="batchTiming"
-                  name="batchTiming"
-                  value={leadData.batchTiming}
-                  onChange={handleInputChange}
-                  className="w-full p-2 border border-gray-300 rounded"
-                >
-                  <option value="">Select a time</option>
-                  {timeOptions.map((time, index) => (
-                    <option key={index} value={time}>{time}</option>
-                  ))}
-                </select>
-              </div>
-            
-
-              <div className="relative">
-                <label className="block text-sm font-medium mb-1" htmlFor="leadStatus">
-                  Lead Status
-                </label>
-                <select
-                  id="leadStatus"
-                  name="leadStatus"
-                  value={leadData.leadStatus}
-                  onChange={handleInputChange}
-                  className="w-full p-2 border border-gray-300 rounded"
-                >
-                  <option value="">Select Lead Status</option>
-                  <option value="Not Contacted">Not Contacted</option>
-                  <option value="Attempted">Attempted</option>
-                  <option value="Warm Lead">Warm Lead</option>
-                  <option value="Cold Lead">Cold Lead</option>
-                </select>
-              </div>
-
-              <div className="relative">
-                <label className="block text-sm font-medium mb-1" htmlFor="leadSource">
-                  Lead Source
-                </label>
-                <select
-                  id="leadSource"
-                  name="leadSource"
-                  value={leadData.leadSource}
-                  onChange={handleInputChange}
-                  className="w-full p-2 border border-gray-300 rounded"
-                >
-                  <option value="">Select Lead Source</option>
-                  <option value="None">None</option>
-                  <option value="Walk-In">Walk-In</option>
-                  <option value="Student Referral">Student Referral</option>
-                  <option value="Demo">Demo</option>
-                  <option value="Website">Website</option>
-                  <option value="Website Chat">Website Chat</option>
-                  <option value="Inbound Call">Inbound Call</option>
-                  <option value="Google Adverts">Google Adverts</option>
-                  <option value="Facebook Ads">Facebook Ads</option>
-                  <option value="Google Business">Google Business</option>
-                  <option value="WhatsApp Skill Capital">WhatsApp Skill Capital</option>
-                </select>
-              </div>
-
-              <div className="relative">
-                <label className="block text-sm font-medium mb-1" htmlFor="course">
-                  Course
-                </label>
-                <select
-                  id="course"
-                  name="course"
-                  value={leadData.course}
-                  onChange={handleInputChange}
-                  className="w-full p-2 border border-gray-300 rounded"
-                >
-                  <option value="">Select Course</option>
-                  <option value="HR Business Partner">HR Business Partner</option>
-                  <option value="HR Generalist">HR Generalist</option>
-                  <option value="HR Analytics">HR Analytics</option>
-                  <option value="Spoken English">Spoken English</option>
-                  <option value="Public Speaking">Public Speaking</option>
-                  <option value="Communication Skills">Communication Skills</option>
-                  <option value="Soft Skills">Soft Skills</option>
-                  <option value="Aptitude">Aptitude</option>
-                  <option value="IELTS">IELTS</option>
-                  <option value="TOEFL">TOEFL</option>
-                  <option value="GRE">GRE</option>
-                  <option value="JFS">JFS</option>
-                  <option value="PFS">PFS</option>
-                  <option value="MERN">MERN</option>
-                  <option value="AWS+DevOps">AWS+DevOps</option>
-                  <option value="Azure+DevOps">Azure+DevOps</option>
-                  <option value="Java Full Stack">Java Full Stack</option>
-                  <option value="Python Full Stack">Python Full Stack</option>
-                </select>
-              </div>
-
-              <div className="relative">
-                <label className="block text-sm font-medium mb-1" htmlFor="selectedClassMode">
-                  Class Mode
-                </label>
-                <select
-                  id="selectedClassMode"
-                  name="selectedClassMode"
-                  value={leadData.selectedClassMode}
-                  onChange={handleInputChange}
-                  className="w-full p-2 border border-gray-300 rounded"
-                >
-                  <option value="">Select Class Mode</option>
-                  <option value="International Online">International Online</option>
-                  <option value="India Online">India Online</option>
-                  <option value="BLR Classroom">BLR Classroom</option>
-                  <option value="HYD Classroom">HYD Classroom</option>
-                </select>
-              </div>
-            </div>
-            <div className="flex justify-end mt-4">
-              <button
-                onClick={handleClose}
-                className="border-2 border-gray-500 text-black py-2 px-4 mx-4 rounded hover:bg-gray-500 hover:text-white"
-              >
-                Close
-              </button>
+      <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-5xl h-full sm:h-auto max-h-[90vh] overflow-y-auto">
+        <h2 className="text-2xl font-bold mb-4 text-teal-500">Lead Details: <span className="text-black mx-2">{leadData.leadname}</span></h2>
+        <form onSubmit={handleSubmit} className="space-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {renderField('leadname', 'Lead Name')}
+            {renderField('email', 'Email')}
+            {renderField('phone', 'Phone')}
+            {renderField('feeQuoted', 'Fee Quoted')}
+            {renderField('batchTiming', 'Batch Timing')}
+            {renderField('leadStatus', 'Lead Status', leadStatusOptions)}
+            {renderField('leadSource', 'Lead Source', leadSourceOptions)}
+            {renderField('course', 'Course', courseOptions)}
+            {renderField('selectedClassMode', 'Class Mode', classModeOptions)}
+          </div>
+          <div className="flex justify-end space-x-4 mt-6">
+            <button
+              type="button"
+              onClick={handleClose}
+              className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500"
+            >
+              Close
+            </button>
+            {isAnyFieldEditing && (
               <button
                 type="submit"
-                className="border-2 border-teal-500 text-black py-2 px-4 rounded hover:bg-teal-600 hover:text-white"
+                className="px-4 py-2 border border-transparent rounded-md shadow-sm text-white bg-teal-600 hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500"
               >
                 Update Lead
               </button>
-            </div>
-          </form>
-        ) : (
-          <p>No lead selected.</p>
-        )}
+            )}
+          </div>
+        </form>
       </div>
     </div>
-  )
+  );
 }

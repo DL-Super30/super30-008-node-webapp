@@ -1,4 +1,5 @@
 "use client";
+
 import { useState } from "react";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
@@ -11,37 +12,31 @@ export default function Navbar() {
   const [showNotifications, setShowNotifications] = useState(false);
   const [showProfileDropdown, setShowProfileDropdown] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [showLogoutModal, setShowLogoutModal] = useState(false); // State for logout modal
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
   const router = useRouter();
 
-  // Handle logout process
   const handleLogout = () => {
-    // Clear session data from localStorage or sessionStorage
     localStorage.removeItem("token");
     sessionStorage.removeItem("token");
-
-    // Redirect to the login page
     router.push("/");
   };
 
-  // Function to show confirmation modal
   const confirmLogout = () => {
-    setShowLogoutModal(true); // Show confirmation modal
-    setShowProfileDropdown(false); // Close profile dropdown
+    setShowLogoutModal(true);
+    setShowProfileDropdown(false);
   };
 
   const pathname = usePathname();
 
   const getLinkClass = (path) => {
     return pathname === path
-      ? "py-2 px-4 font-bold bg-teal-100 text-black border-b-4 border-b-teal-500"
-      : "py-2 px-4 hover:bg-gray-100 text-gray-700 border-b-4 border-b-transparent hover:border-b-teal-500";
+      ? "py-2 px-4 font-bold bg-teal-100 text-black border-l-4 border-l-teal-500 lg:border-l-0 lg:border-b-4 lg:border-b-teal-500"
+      : "py-2 px-4 hover:bg-gray-100 text-gray-700 border-l-4 border-l-transparent hover:border-l-teal-500 lg:border-l-0 lg:border-b-4 lg:border-b-transparent lg:hover:border-b-teal-500";
   };
 
   return (
     <>
       <nav className="sticky top-0 p-2 flex flex-col lg:flex-row items-center justify-between shadow-md bg-white z-50">
-        {/* Logo and Hamburger Icon for mobile */}
         <div className="flex items-center justify-between w-full lg:w-auto">
           <div className="text-xl font-bold pl-8">
             <Link href="/dashboard">
@@ -49,10 +44,10 @@ export default function Navbar() {
                 <Image
                   src="/images/logo.png"
                   alt="Logo"
-                  width={0} // Set your desired width
-                  height={0} // Set your desired height
+                  width={0}
+                  height={0}
                   layout="responsive"
-                  className="h-auto w-auto" // Use this class if needed
+                  className="h-auto w-auto"
                 />
               </div>
             </Link>
@@ -60,13 +55,13 @@ export default function Navbar() {
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             className="lg:hidden text-2xl ml-4"
+            aria-label={mobileMenuOpen ? "Close menu" : "Open menu"}
           >
             {mobileMenuOpen ? <FaTimes /> : <FaBars />}
           </button>
         </div>
 
-        {/* Navigation Links for larger screens */}
-        <div className={`lg:flex lg:space-x-3 flex-grow justify-center ${mobileMenuOpen ? 'block' : 'hidden'} lg:block`}>
+        <div className={`lg:flex lg:space-x-3 flex-grow justify-center ${mobileMenuOpen ? 'flex flex-col w-full' : 'hidden'} lg:flex-row`}>
           <Link href="/dashboard" className={getLinkClass("/dashboard")}>
             Home
           </Link>
@@ -90,9 +85,7 @@ export default function Navbar() {
           </Link>
         </div>
 
-        {/* Right-side icons for larger screens */}
-        <div className="hidden lg:flex items-center space-x-4 ml-auto">
-          {/* Notification Icon */}
+        <div className={`${mobileMenuOpen ? 'flex' : 'hidden'} lg:flex items-center space-x-4 mt-4 lg:mt-0`}>
           <div className="relative">
             <FaBell
               className="text-2xl cursor-pointer"
@@ -112,7 +105,6 @@ export default function Navbar() {
             )}
           </div>
 
-          {/* Profile Icon */}
           <div className="relative">
             <FaUser
               className="text-2xl cursor-pointer"
@@ -134,7 +126,6 @@ export default function Navbar() {
         </div>
       </nav>
 
-      {/* Logout Confirmation Modal */}
       {showLogoutModal && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
           <div className="bg-white p-6 rounded-lg shadow-lg">

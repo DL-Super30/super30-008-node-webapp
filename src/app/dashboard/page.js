@@ -1,7 +1,7 @@
 "use client"
 import { useRouter } from "next/navigation";
 import Charts from '../chartComponent/charts';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 
 function Dashboard() {
   const router = useRouter();
@@ -25,6 +25,47 @@ function Dashboard() {
     }
   }, [router]);
   const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
+
+  
+
+  // Process leads to ensure 24-hour data in IST format
+  const processLeadsByHour = useCallback((leads) => {
+    const hoursInDay = Array.from({ length: 24 }, (_, i) => i); // 0 to 23
+    const leadsPerHour = hoursInDay.map((hour) => {
+      const leadForHour = leads.find((lead) => {
+        const localTime = new Date(lead.hour).toLocaleString('en-IN', {
+          timeZone: 'Asia/Kolkata',
+          hour: '2-digit',
+          hour12: false,
+        });
+        return parseInt(localTime) === hour;
+      });
+      return {
+        hour: hour.toString().padStart(2, '0') + ':00',
+        leadCount: leadForHour ? parseInt(leadForHour.leadCount) : 0,
+      };
+    });
+    return leadsPerHour;
+  }, []);
+
+  // Function to process leads by status
+  const processLeadsByStatus = useCallback((leads) => {
+    const statusLabels = ['Not Contacted', 'Attempted', 'Warm Lead', 'Cold Lead'];
+    const statusData = statusLabels.map((status) => {
+      const lead = leads.find(lead => lead.leadStatus === status);
+      return lead ? parseInt(lead.leadCount) : 0;
+    });
+
+    const total = statusData.reduce((acc, count) => acc + count, 0); // Calculate total leads
+
+    return {
+      processedLeadsByStatus: {
+        labels: statusLabels,
+        data: statusData,
+      },
+      total,
+    };
+  }, []);
 
   useEffect(() => {
     const fetchLeadsData = async () => {
@@ -50,48 +91,7 @@ function Dashboard() {
     };
 
     fetchLeadsData();
-  }, []);
-
-  // Process leads to ensure 24-hour data in IST format
-  const processLeadsByHour = (leads) => {
-    const hoursInDay = Array.from({ length: 24 }, (_, i) => i); // 0 to 23
-    const leadsPerHour = hoursInDay.map((hour) => {
-      const leadForHour = leads.find(
-        (lead) => {
-          const localTime = new Date(lead.hour).toLocaleString('en-IN', {
-            timeZone: 'Asia/Kolkata',
-            hour: '2-digit',
-            hour12: false,
-          });
-          return parseInt(localTime) === hour;
-        }
-      );
-      return {
-        hour: hour.toString().padStart(2, '0') + ':00',
-        leadCount: leadForHour ? parseInt(leadForHour.leadCount) : 0,
-      };
-    });
-    return leadsPerHour;
-  };
-
-  // Process lead status for doughnut chart and calculate total leads
-  const processLeadsByStatus = (leads) => {
-    const statusLabels = ['Not Contacted', 'Attempted', 'Warm Lead', 'Cold Lead'];
-    const statusData = statusLabels.map((status) => {
-      const lead = leads.find(lead => lead.leadStatus === status);
-      return lead ? parseInt(lead.leadCount) : 0;
-    });
-
-    const total = statusData.reduce((acc, count) => acc + count, 0); // Calculate total leads
-
-    return {
-      processedLeadsByStatus: {
-        labels: statusLabels,
-        data: statusData,
-      },
-      total,
-    };
-  };
+  }, [API_BASE_URL, processLeadsByHour, processLeadsByStatus]);
 
   return (
     <div className="min-h-screen bg-slate-100 py-8">

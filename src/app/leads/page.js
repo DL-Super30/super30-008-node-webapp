@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useCallback } from "react";
 import axios from "axios";
 import { useRouter } from "next/navigation";
 import CreateLeadModal from "../components/createLeadModal";
@@ -39,12 +39,10 @@ export default function Leads() {
     }
   }, [router]);
 
-  useEffect(() => {
-    fetchLeads();
-  }, []);
+  
   const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
-  const fetchLeads = async () => {
+  const fetchLeads = useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
@@ -59,7 +57,11 @@ export default function Leads() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [API_BASE_URL]);
+  
+  useEffect(() => {
+    fetchLeads();
+  }, [fetchLeads]);
 
   const filteredLeads = useMemo(() => {
     let filtered = [...allLeads];
@@ -105,12 +107,15 @@ export default function Leads() {
   const totalPages = Math.ceil(filteredLeads.length / leadsPerPage);
 
   const handleCheckboxChange = (leadId) => {
-    setSelectedLeads(prevSelected =>
+    setSelectedLeads((prevSelected) =>
       prevSelected.includes(leadId)
-        ? prevSelected.filter(id => id !== leadId)
+        ? prevSelected.filter((id) => id !== leadId)
         : [...prevSelected, leadId]
     );
   };
+  useEffect(() => {
+    console.log('Selected leads:', selectedLeads);
+  }, [selectedLeads]);  
 
   const handleConvertClick = () => {
     if (selectedLeads.length > 0) {
@@ -129,7 +134,7 @@ export default function Leads() {
     }
   };
 
-  const handleConfirmConversion = async () => {
+  const handleConfirmConversion = async (convertTo) => {
     setLoading(true);
     try {
       for (const leadId of selectedLeads) {
@@ -138,33 +143,40 @@ export default function Leads() {
           headers: {
             'Content-Type': 'application/json',
           },
+          body: JSON.stringify({
+            convertTo: convertTo, // Post the selected conversion type
+          }),
         });
 
         const data = await response.json();
 
         if (!response.ok) {
-          if (data.status === "Error" && data.message === "An error occurred while converting the lead to an opportunity" && data.error === "Validation error") {
-            throw new Error("Email already exists");
+          if (
+            data.status === 'Error' &&
+            data.message === 'An error occurred while converting the lead to an opportunity' &&
+            data.error === 'Validation error'
+          ) {
+            throw new Error('Email already exists');
           } else {
             throw new Error(`Failed to convert lead ${leadId}`);
           }
         }
 
-        console.log(`Lead ${leadId} converted successfully:`, data);
+        console.log(`Lead ${leadId} converted to ${convertTo} successfully:`, data);
       }
 
       // After all conversions are done
       setLoading(false);
       setModalOpen(false);
       toast.success('Leads converted successfully!', {
-        position: "top-center",
+        position: 'top-center',
         autoClose: 3000,
         hideProgressBar: false,
         closeOnClick: true,
         pauseOnHover: true,
         draggable: true,
         progress: undefined,
-        theme: "colored",
+        theme: 'colored',
       });
 
       // Refresh the leads list
@@ -172,73 +184,75 @@ export default function Leads() {
 
       // Clear selected leads
       setSelectedLeads([]);
-
     } catch (error) {
       console.error('Error converting leads:', error);
       setLoading(false);
 
-      if (error.message === "Email already exists") {
+      if (error.message === 'Email already exists') {
         toast.error('Failed to convert lead. Email already exists in opportunities.', {
-          position: "top-center",
+          position: 'top-center',
           autoClose: 5000,
           hideProgressBar: false,
           closeOnClick: true,
           pauseOnHover: true,
           draggable: true,
           progress: undefined,
-          theme: "colored",
+          theme: 'colored',
         });
       } else {
         toast.error('Failed to convert leads. Please try again.', {
-          position: "top-center",
+          position: 'top-center',
           autoClose: 3000,
           hideProgressBar: false,
           closeOnClick: true,
           pauseOnHover: true,
           draggable: true,
           progress: undefined,
-          theme: "colored",
+          theme: 'colored',
         });
       }
     }
   };
 
+  
+
   const handleCloseModal = () => {
     setModalOpen(false);
   };
 
-  const handleUpdateClick = () => {
-    if (selectedLeads.length === 0) {
-      toast.warn('Please select atleast one lead to update!', {
-        position: "top-center",
-        autoClose: 3000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        theme: "colored",
-        // transition: Bounce,
-      });
-    } else if (selectedLeads.length === 1) {
+  const handleUpdateClick = (leadId = null) => {
+    // Case 1: If leadId is passed (from row click)
+    if (leadId) {
+      const lead = allLeads.find((lead) => lead.id === leadId);
+      if (lead) {
+        dispatch(openModal(lead)); // Open modal with selected lead's data
+      }
+    }
+    // Case 2: If selected leads (from checkbox selection)
+    else if (selectedLeads.length === 1) {
       const lead = allLeads.find((lead) => lead.id === selectedLeads[0]);
       if (lead) {
-        dispatch(openModal(lead));
+        dispatch(openModal(lead)); // Open modal with selected lead's data
       }
+    } 
+    // Case 3: Handle other cases (0 or multiple selections)
+    else if (selectedLeads.length === 0) {
+      toast.warn('Please select at least one lead to update!', {
+        position: "top-center",
+        autoClose: 3000,
+        theme: "colored",
+      });
     } else {
       toast.error('Please select only one lead to update at a time.', {
         position: "top-center",
         autoClose: 3000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
         theme: "colored",
-        // transition: Bounce,
       });
     }
   };
+  
+  
+  
 
   const handleDeleteClick = () => {
     if (selectedLeads.length > 0) {
@@ -373,7 +387,7 @@ export default function Leads() {
             </div>
             {isActionsDropdownOpen && (
               <ul className="absolute top-full mt-1 bg-white shadow-lg rounded-lg z-40 w-full sm:w-auto">
-                <li className="px-4 py-2 hover:bg-teal-100 cursor-pointer" onClick={handleUpdateClick}>Update</li>
+                <li className="px-4 py-2 hover:bg-teal-100 cursor-pointer" onClick={()=>handleUpdateClick()}>Update</li>
                 <li className="px-4 py-2 hover:bg-teal-100 cursor-pointer" onClick={handleDeleteClick}>Delete</li>
                 <li className="px-4 py-2 hover:bg-teal-100 cursor-pointer" onClick={handleConvertClick}>Convert</li>
               </ul>
@@ -480,12 +494,18 @@ export default function Leads() {
                 </tr>
               ) : (
                 paginatedLeads.map((lead) => (
-                  <tr key={lead.id} className="border-b border-b-teal-100">
-                    <td className="p-2 text-center">
+                  <tr key={lead.id} className="border-b border-b-teal-100 cursor-pointer" onClick={() => handleUpdateClick(lead.id)}>
+                    <td
+                      className="p-2 text-center"
+                      onClick={(e) => e.stopPropagation()} // Prevent row click when checkbox is clicked
+                    >
                       <input
                         type="checkbox"
-                        checked={selectedLeads.includes(lead.id)}
-                        onChange={() => handleCheckboxChange(lead.id)}
+                        checked={selectedLeads.includes(lead.id)} // Control the checkbox based on the selectedLeads array
+                        onChange={(e) => {
+                          e.stopPropagation(); // Prevent row click when checkbox is changed
+                          handleCheckboxChange(lead.id); // Update selected leads on checkbox change
+                        }}
                       />
                     </td>
                     <td className="p-2 text-center">{formatDate(lead.createdAt)}</td>
@@ -495,6 +515,9 @@ export default function Leads() {
                     <td className="p-2 text-center">{lead.email}</td>
                     <td className="p-2 text-center">{lead.course || 'N/A'}</td>
                   </tr>
+
+
+
                 ))
               )}
             </tbody>

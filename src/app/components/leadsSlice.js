@@ -8,7 +8,7 @@ export const updateLead = createAsyncThunk(
   'leads/updateLead',
   async (updatedLead, { rejectWithValue }) => {
     try {
-      const response = await axios.post(`${API_BASE_URL}/leads/`, updatedLead);
+      const response = await axios.post(`${API_BASE_URL}`, updatedLead);
       return response.data;  // Returning the updated lead data
     } catch (error) {
       return rejectWithValue(error.response.data);
