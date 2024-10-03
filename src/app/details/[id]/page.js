@@ -9,8 +9,8 @@ import {
   getLeadsApi,
   updateLeadsApi,
 } from "@/slices/leadsSlice";
-import { getOpportunityApi } from "@/slices/opportunitiesSlice";
-import { getlearnerApi } from "@/slices/learnersSlice";
+import { getOpportunityApi, updateOpportunityApi } from "@/slices/opportunitiesSlice";
+import { getlearnerApi, updatelearnerApi } from "@/slices/learnersSlice";
 
 const DetailPage = () => {
   const router = useRouter();
@@ -70,7 +70,14 @@ const DetailPage = () => {
     console.log(itemInfo);
     item[key].editEnabled = false;
     setItem({ ...item });
+    if(type === "leads"){
     dispatch(updateLeadsApi({ itemInfo, id: params.id }));
+  } else if(type === "opportunities") {
+    dispatch(updateOpportunityApi({ itemInfo, id: params.id }));
+  }else if(type === "learners") {
+    dispatch(updatelearnerApi({ itemInfo, id: params.id }));
+  }
+
   };
 
   const handleChange = (e) => {
@@ -276,7 +283,7 @@ const DetailPage = () => {
                       </label>
                       <div className="flex">
                         <input
-                          type="text"
+                          type=""
                           className="w-full border-b-2 border-gray-300 p-2 rounded text-base font-medium"
                           placeholder=""
                           value={item.cc?.value}
@@ -1099,6 +1106,7 @@ const DetailPage = () => {
                   <label className="block text-base font-medium gap-2 text-gray-800 ">
                     CC
                   </label>
+                  <div className="flex">
                   <input
                     type="text"
                     className="w-full border-b-2 border-gray-300 p-2 rounded text-base font-medium"
@@ -1109,11 +1117,22 @@ const DetailPage = () => {
                     name="cc"
                   />
                   {!item.cc?.editEnabled && (
-                    <button onClick={() => enableEditable("cc")}>Edit</button>
+                    <button onClick={() => enableEditable("cc")}><Image
+                    src="/images/edit-icon.png"
+                    alt="edit-icon"
+                    width={20}
+                    height={20}
+                  /></button>
                   )}
                   {item.cc?.editEnabled && (
-                    <button onClick={() => saveDetails("cc")}>Save</button>
+                    <button onClick={() => saveDetails("cc")}><Image
+                    src="/images/save-icon.png"
+                    alt="save-icon"
+                    width={20}
+                    height={20}
+                  /></button>
                   )}
+                  </div>
                 </div>
                 <div className="mb-4">
                   <label className="block text-base font-medium gap-2 text-gray-500">
@@ -1907,7 +1926,7 @@ const DetailPage = () => {
                   <label className="block text-base font-medium gap-2 text-gray-500">
                     Course
                   </label>
-                  <div>
+                  <div className="flex">
                     <input
                       type=""
                       className="w-full border-b-2 border-gray-300 p-2 text-gray-800"
@@ -1920,8 +1939,8 @@ const DetailPage = () => {
                     {!item.course?.editEnabled && (
                       <button onClick={() => enableEditable("course")}>
                         <Image
-                          src="/images/save-icon.png"
-                          alt="save-icon"
+                          src="/images/edit-icon.png"
+                          alt="edit-icon"
                           width={20}
                           height={20}
                         />
@@ -1948,10 +1967,10 @@ const DetailPage = () => {
                       type=""
                       className="w-full border-b-2 border-gray-300 p-2 text-gray-800"
                       placeholder=""
-                      value={item.classMode?.value}
+                      value={item.ClassMode?.value}
                       onChange={(e) => handleChange(e)}
-                      disabled={!item.classMode?.editEnabled}
-                      name="classMode"
+                      disabled={!item.ClassMode?.editEnabled}
+                      name="ClassMode"
                     >
                       <option className="text-neutral-800" value="">
                         Select Class Mode
@@ -1972,8 +1991,8 @@ const DetailPage = () => {
                         HYD Class Room
                       </option>
                     </select>
-                    {!item.classMode?.editEnabled && (
-                      <button onClick={() => enableEditable("classMode")}>
+                    {!item.ClassMode?.editEnabled && (
+                      <button onClick={() => enableEditable("ClassMode")}>
                         <Image
                           src="/images/edit-icon.png"
                           alt="edit-icon"
@@ -1982,8 +2001,8 @@ const DetailPage = () => {
                         />
                       </button>
                     )}
-                    {item.classMode?.editEnabled && (
-                      <button onClick={() => saveDetails("classMode")}>
+                    {item.ClassMode?.editEnabled && (
+                      <button onClick={() => saveDetails("ClassMode")}>
                         <Image
                           src="/images/save-icon.png"
                           alt="save-icon"
@@ -2136,7 +2155,7 @@ const DetailPage = () => {
                     Last Name
                   </label>
                   <div className="flex">
-                    <select
+                    <input
                       type=""
                       className="w-full border-b-2 border-gray-300 p-2 rounded text-gray-800"
                       placeholder=""
@@ -2144,26 +2163,7 @@ const DetailPage = () => {
                       onChange={(e) => handleChange(e)}
                       disabled={!item.lastname?.editEnabled}
                       name="lastname"
-                    >
-                      <option className="text-neutral-800" value="">
-                        Select Opportunity Status
-                      </option>
-                      <option className="text-neutral-800" value="visiting">
-                        Visiting
-                      </option>
-                      <option className="text-neutral-800" value="visited">
-                        Visited
-                      </option>
-                      <option className="text-neutral-800" value="demoAttended">
-                        Demo Attended
-                      </option>
-                      <option
-                        className="text-neutral-800"
-                        value="lostOpportunity"
-                      >
-                        lost Opportunity
-                      </option>
-                    </select>
+                    />
                     {!item.lastname?.editEnabled && (
                       <button onClick={() => enableEditable("lastname")}>
                         <Image

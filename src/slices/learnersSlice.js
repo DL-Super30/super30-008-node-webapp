@@ -30,7 +30,7 @@ export const createLearnerApi = createAsyncThunk('createLearnerApi', async (payl
 
 export const updatelearnerApi = createAsyncThunk('updatelearnerApi', async (payload) => {
     try {
-        const response = await axios.put('http://localhost:4000/api/learner' + payload.id, payload.itemInfo);
+        const response = await axios.put('http://localhost:4000/api/learner/' + payload.id, payload.itemInfo);
         return response;
     } catch(error) {
         if (error.response) {
