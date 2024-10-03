@@ -643,7 +643,7 @@ const DataList = ({ type, items }) => {
             ""
           )}
 
-          <div className="flex items-center">
+          {type !== 'courses' && <div className="flex items-center">
             <button
               onClick={() => toggleViewMode("table")}
               className="flex border rounded-l-lg py-1 px-4 gap-2 w-1/2 border-gray-600"
@@ -670,7 +670,7 @@ const DataList = ({ type, items }) => {
               />
               Kanban
             </button>
-          </div>
+          </div>}
         </div>
 
         {viewMode === "table" ? (
