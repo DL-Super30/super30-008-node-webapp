@@ -65,7 +65,7 @@ export default function Navbar() {
                 <button>
                   <Link
                     className={`text-black hover:text-black ${
-                      pathname === "/homepage"
+                      pathname === "/dashboard"
                         ? "text-black border border-white border-b-orange-500 border-b-4 bg-red-100 p-2"
                         : ""
                     }`}
