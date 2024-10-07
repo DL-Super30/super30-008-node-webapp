@@ -1,20 +1,25 @@
 {
-    "login": [
+    "users": [
         {
             "username": "monalisa",
-            "password": "123456"
+            "password": "Admin@111",
+            "id": "df6b"
         }
     ],
-    "users": [
+    "leads": [
         {
             "id": 1,
             "name": "John Doe",
-            "email": "john@example.com"
+            "email": "john.doe@example.com",
+            "phone": "1234567890",
+            "status": "Active"
         },
         {
             "id": 2,
             "name": "Jane Smith",
-            "email": "jane@example.com"
+            "email": "jane.smith@example.com",
+            "phone": "0987654321",
+            "status": "Pending"
         }
     ]
 }
