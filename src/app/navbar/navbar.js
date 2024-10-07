@@ -4,7 +4,6 @@ import Image from "next/image";
 import { useSelector } from "react-redux";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { FaChevronDown } from "react-icons/fa";
 import { useDispatch } from "react-redux";
 import { logout } from "@/slices/loginSlice";
 import { useState, useEffect } from "react";
@@ -86,10 +85,8 @@ export default function Navbar() {
                     href="/leads"
                   >
                     Leads
-                    <FaChevronDown className="ml-1 text-xs items-center font-thin" />
                   </Link>
                 </button>
-
                 <button>
                   <Link
                     className={`text-black flex items-center hover:text-black ${
@@ -100,10 +97,8 @@ export default function Navbar() {
                     href="/opportunities"
                   >
                     opportunities
-                    <FaChevronDown className="ml-1 text-xs items-center font-thin" />
                   </Link>
                 </button>
-
                 <button>
                   <Link
                     className={`text-black flex items-center hover:text-black ${
@@ -114,10 +109,8 @@ export default function Navbar() {
                     href="/learners"
                   >
                     Learners
-                    <FaChevronDown className="ml-1 text-xs items-center font-thin" />
                   </Link>
                 </button>
-
                 <button>
                   <Link
                     className={`text-black flex items-center hover:text-black ${
@@ -128,10 +121,8 @@ export default function Navbar() {
                     href="/courses"
                   >
                     Courses
-                    <FaChevronDown className="ml-1 text-xs items-center font-thin" />
                   </Link>
                 </button>
-
                 <button>
                   <Link
                     className={`text-black flex items-center hover:text-black ${
@@ -142,10 +133,8 @@ export default function Navbar() {
                     href="/activities"
                   >
                     Activities
-                    <FaChevronDown className="ml-1 text-xs items-center font-thin" />
                   </Link>
                 </button>
-
                 <button>
                   <Link
                     className={`text-black flex items-center hover:text-black ${
@@ -155,8 +144,7 @@ export default function Navbar() {
                     }`}
                     href="/analytics"
                   >
-                    Analytics
-                    <FaChevronDown className="ml-1 text-xs items-center font-thin" />
+                    Analytics 
                   </Link>
                 </button>
               </div>

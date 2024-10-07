@@ -9,8 +9,13 @@ import {
   getLeadsApi,
   updateLeadsApi,
 } from "@/slices/leadsSlice";
-import { getOpportunityApi, updateOpportunityApi } from "@/slices/opportunitiesSlice";
-import { getlearnerApi, updatelearnerApi } from "@/slices/learnersSlice";
+import { convertOpportunityApi, getOpportunityApi, updateOpportunityApi } from "@/slices/opportunitiesSlice";
+import { convertLearnerApi, getlearnerApi, updatelearnerApi } from "@/slices/learnersSlice";
+import {
+  updateCourseApi,
+  getCourseApi,
+} from "@/slices/coursesSlice";
+
 
 const DetailPage = () => {
   const router = useRouter();
@@ -33,7 +38,10 @@ const DetailPage = () => {
       dispatch(getOpportunityApi());
     } else if (type === "learners") {
       dispatch(getlearnerApi());
+    } else if (type === "courses") {
+      dispatch(getCourseApi());
     }
+
   }, [type, params.id]);
 
   useEffect(() => {
@@ -76,6 +84,8 @@ const DetailPage = () => {
     dispatch(updateOpportunityApi({ itemInfo, id: params.id }));
   }else if(type === "learners") {
     dispatch(updatelearnerApi({ itemInfo, id: params.id }));
+  } else if(type === "courses") {
+    dispatch(updateCourseApi({ itemInfo, id: params.id }));
   }
 
   };
@@ -91,9 +101,15 @@ const DetailPage = () => {
     setActiveTab(tabName);
   };
 
-  const handleConvertLeadToOpportunity = () => {
+  const handleConvert = () => {
     console.log("convert");
-    dispatch(convertLeadsApi(params.id));
+    if (type === 'leads') {
+    dispatch(convertLeadsApi({id: params.id, convertTo: 'opportunity'}));
+  } else if (type === 'opportunities') {
+    dispatch(convertOpportunityApi({id: params.id, convertTo: 'learner'}));
+  } else if (type === 'learners') {
+    dispatch(convertLearnerApi({id: params.id, convertTo: 'course'}));
+  } 
     handleBack();
   };
 
@@ -133,7 +149,7 @@ const DetailPage = () => {
                 <div className="mx-3 ">
                   <button
                     className="text-base bg-cyan-500 text-center px-3 py-1 border rounded-md"
-                    onClick={() => handleConvertLeadToOpportunity()}
+                    onClick={() => handleConvert()}
                   >
                     Convert
                   </button>
@@ -185,13 +201,13 @@ const DetailPage = () => {
                 <div id="leadsDetails">
                   <div className="grid grid-cols-2 gap-4 px-3">
                     <div className="mb-4">
-                      <label className="block text-base font-medium gap-2 text-gray-800 ">
+                      <label className="block text-base font-medium gap-2 text-black">
                         Name
                       </label>
                       <div className="flex">
                         <input
                           type="text"
-                          className="w-full border-b-2 border-gray-300 p-2 rounded text-base font-medium "
+                          className="w-full border-b-2 border-gray-300 p-2 rounded text-base font-normal "
                           placeholder=""
                           value={item.leadname?.value}
                           onChange={(e) => handleChange(e)}
@@ -221,13 +237,13 @@ const DetailPage = () => {
                       </div>
                     </div>
                     <div className="mb-4">
-                      <label className="block text-base font-medium gap-2 text-gray-500">
+                      <label className="block text-base font-medium gap-2 text-black">
                         Lead status
                       </label>
                       <div className="flex">
                         <select
                           type=""
-                          className="w-full border-b-2 border-gray-300 p-2 rounded text-gray-800"
+                          className="w-full border-b-2 border-gray-300 p-2 rounded text-black"
                           placeholder=""
                           value={item.leadStatus?.value}
                           onChange={(e) => handleChange(e)}
@@ -278,13 +294,13 @@ const DetailPage = () => {
                       </div>
                     </div>
                     <div className="mb-4">
-                      <label className="block text-base font-medium gap-2 text-gray-800 ">
+                      <label className="block text-base font-medium gap-2 text-black">
                         CC
                       </label>
                       <div className="flex">
                         <input
                           type=""
-                          className="w-full border-b-2 border-gray-300 p-2 rounded text-base font-medium"
+                          className="w-full border-b-2 border-gray-300 p-2 rounded text-base font-normal"
                           placeholder=""
                           value={item.cc?.value}
                           onChange={(e) => handleChange(e)}
@@ -316,13 +332,13 @@ const DetailPage = () => {
                       </div>
                     </div>
                     <div className="mb-4">
-                      <label className="block text-base font-medium gap-2 text-gray-500">
+                      <label className="block text-base font-medium gap-2 text-black">
                         Lead Source
                       </label>
                       <div className="flex">
                         <select
                           type=""
-                          className="w-full border-b-2 border-gray-300 p-2 rounded text-gray-800"
+                          className="w-full border-b-2 border-gray-300 p-2 rounded text-black"
                           placeholder="Lead source"
                           value={item.leadSource?.value}
                           onChange={(e) => handleChange(e)}
@@ -411,11 +427,11 @@ const DetailPage = () => {
                       </div>
                     </div>
                     <div className="mb-4">
-                      <label className="block text-sm font-medium">Phone</label>
+                      <label className="block text-base font-medium gap-2 text-black">Phone</label>
                       <div className="flex">
                         <input
                           type="text"
-                          className="w-full border-b-2 border-gray-300 p-2 rounded"
+                          className="w-full border-b-2 border-gray-300 p-2 rounded text-black"
                           placeholder="Enter phone no."
                           value={item.phone?.value}
                           onChange={(e) => handleChange(e)}
@@ -446,13 +462,13 @@ const DetailPage = () => {
                       </div>
                     </div>
                     <div className="mb-4">
-                      <label className="block text-base font-medium gap-2 text-gray-500">
+                      <label className="block text-base font-medium gap-2 text-black">
                         Stack
                       </label>
                       <div className="flex">
                         <select
                           type=""
-                          className="w-full border-b-2 border-gray-300 p-2 rounded text-gray-800"
+                          className="w-full border-b-2 border-gray-300 p-2 rounded text-black"
                           placeholder="Enter Stack"
                           value={item.stack?.value}
                           onChange={(e) => handleChange(e)}
@@ -537,13 +553,13 @@ const DetailPage = () => {
                       </div>
                     </div>
                     <div className="mb-4">
-                      <label className="block text-sm font-medium">
+                      <label className="block text-sm font-medium text-black">
                         Course
                       </label>
                       <div className="flex">
                         <input
                           type="text"
-                          className="w-full border-b-2 border-gray-300 p-2 rounded"
+                          className="w-full border-b-2 border-gray-300 p-2 rounded text-black"
                           placeholder="Enter Course"
                           value={item.course?.value}
                           onChange={(e) => handleChange(e)}
@@ -574,14 +590,14 @@ const DetailPage = () => {
                       </div>
                     </div>
                     <div className="mb-4">
-                      <label className="block text-sm font-medium">
+                      <label className="block text-sm font-medium text-black">
                         Fee Quoted
                       </label>
                       <div className="flex">
                         <input
                           type="text"
-                          className="w-full border-b-2 border-gray-300 p-2 rounded"
-                          placeholder="Enter Fee quoted"
+                          className="w-full border-b-2 border-gray-300 p-2 rounded text-black"
+                          placeholder=""
                           value={item.feeQuoted?.value}
                           onChange={(e) => handleChange(e)}
                           disabled={!item.feeQuoted?.editEnabled}
@@ -611,13 +627,13 @@ const DetailPage = () => {
                       </div>
                     </div>
                     <div className="mb-4">
-                      <label className="block text-base font-medium gap-2 text-gray-500">
+                      <label className="block text-base font-medium gap-2 text-black">
                         Class Mode
                       </label>
                       <div className="flex">
                         <select
                           type=""
-                          className="w-full border-b-2 border-gray-300 p-2 text-gray-800"
+                          className="w-full border-b-2 border-gray-300 p-2 text-black font-normal"
                           placeholder="Select class mode"
                           value={item.selectedClassMode?.value}
                           onChange={(e) => handleChange(e)}
@@ -680,13 +696,13 @@ const DetailPage = () => {
                       </div>
                     </div>
                     <div className="mb-4">
-                      <label className="block text-sm font-medium">
+                      <label className="block text-sm font-medium text-black">
                         Batch Timing
                       </label>
                       <div className="flex">
                         <input
                           type="text"
-                          className="w-full border-b-2 border-gray-300 p-2 rounded"
+                          className="w-full border-b-2 border-gray-300 p-2 rounded text-black"
                           placeholder="Select timing"
                           value={item.batchTiming?.value}
                           onChange={(e) => handleChange(e)}
@@ -717,13 +733,13 @@ const DetailPage = () => {
                       </div>
                     </div>
                     <div className="mb-4">
-                      <label className="block text-sm font-medium">
+                      <label className="block text-sm font-medium text-black">
                         Next FollowUp
                       </label>
                       <div className="flex">
                         <input
                           type="datetime-local"
-                          className="w-full border-b-2 border-gray-300 p-2 rounded"
+                          className="w-full border-b-2 border-gray-300 p-2 rounded text-black"
                           placeholder="Select next followup"
                           value={item.nextFollowUp?.value}
                           onChange={(e) => handleChange(e)}
@@ -756,13 +772,13 @@ const DetailPage = () => {
                       </div>
                     </div>
                     <div className="mb-4">
-                      <label className="block text-sm font-medium">
+                      <label className="block text-sm font-medium text-black">
                         Description
                       </label>
                       <div className="flex">
                         <input
                           type="text"
-                          className="w-full border-b-2 border-gray-300 p-2 rounded"
+                          className="w-full border-b-2 border-gray-300 p-2 rounded text-black"
                           placeholder="Description"
                           value={item.description?.value}
                           onChange={(e) => handleChange(e)}
@@ -978,7 +994,10 @@ const DetailPage = () => {
                 </div>
 
                 <div className="mx-3 ">
-                  <button className="text-base bg-cyan-500 text-center px-3 py-1 border rounded-md">
+                <button
+                    className="text-base bg-cyan-500 text-center px-3 py-1 border rounded-md"
+                    onClick={() => handleConvert()}
+                  >
                     Convert
                   </button>
                 </div>
@@ -1009,13 +1028,13 @@ const DetailPage = () => {
             <div className="mt-40 pt-3 px-3 shadow-lg shadow-gray-400">
               <div className="grid grid-cols-2 gap-4 px-3">
                 <div className="mb-4">
-                  <label className="block text-base font-medium gap-2 text-gray-800 ">
+                  <label className="block text-base font-medium gap-2 text-black">
                     Name
                   </label>
                   <div className="flex">
                     <input
                       type="text"
-                      className="w-full border-b-2 border-gray-300 p-2 rounded text-base font-medium"
+                      className="w-full border-b-2 border-gray-300 p-2 rounded text-base font-normal"
                       placeholder=""
                       value={item.name?.value}
                       onChange={(e) => handleChange(e)}
@@ -1046,13 +1065,13 @@ const DetailPage = () => {
                   </div>
                 </div>
                 <div className="mb-4">
-                  <label className="block text-base font-medium gap-2 text-gray-500">
+                  <label className="block text-base font-medium gap-2 text-black">
                     Opportunity Status
                   </label>
                   <div className="flex">
                     <select
                       type=""
-                      className="w-full border-b-2 border-gray-300 p-2 rounded text-gray-800"
+                      className="w-full border-b-2 border-gray-300 p-2 rounded text-black font-normal"
                       placeholder="Lead status"
                       value={item.opportunityStatus?.value}
                       onChange={(e) => handleChange(e)}
@@ -1103,13 +1122,13 @@ const DetailPage = () => {
                   </div>
                 </div>
                 <div className="mb-4">
-                  <label className="block text-base font-medium gap-2 text-gray-800 ">
+                  <label className="block text-base font-medium gap-2 text-black">
                     CC
                   </label>
                   <div className="flex">
                   <input
                     type="text"
-                    className="w-full border-b-2 border-gray-300 p-2 rounded text-base font-medium"
+                    className="w-full border-b-2 border-gray-300 p-2 rounded text-base font-normal text-black"
                     placeholder=""
                     value={item.cc?.value}
                     onChange={(e) => handleChange(e)}
@@ -1135,18 +1154,18 @@ const DetailPage = () => {
                   </div>
                 </div>
                 <div className="mb-4">
-                  <label className="block text-base font-medium gap-2 text-gray-500">
+                  <label className="block text-base font-medium gap-2 text-black">
                     Opportunity Stage
                   </label>
                   <div className="flex">
                     <select
                       type=""
-                      className="w-full border-b-2 border-gray-300 p-2 rounded text-gray-800"
+                      className="w-full border-b-2 border-gray-300 p-2 rounded text-black font-normal"
                       placeholder=""
-                      value={item.opportunityStage?.value}
+                      value={item.opportunitySatge?.value}
                       onChange={(e) => handleChange(e)}
-                      disabled={!item.opportunityStage?.editEnabled}
-                      name="opportunityStage"
+                      disabled={!item.opportunitySatge?.editEnabled}
+                      name="opportunitySatge"
                     >
                       <option className="text-neutral-800" value="">
                         Select Opportunity Stage
@@ -1236,9 +1255,9 @@ const DetailPage = () => {
                         Closed Lost
                       </option>
                     </select>
-                    {!item.opportunityStage?.editEnabled && (
+                    {!item.opportunitySatge?.editEnabled && (
                       <button
-                        onClick={() => enableEditable("opportunityStage")}
+                        onClick={() => enableEditable("opportunitySatge")}
                       >
                         <Image
                           src="/images/edit-icon.png"
@@ -1248,8 +1267,8 @@ const DetailPage = () => {
                         />
                       </button>
                     )}
-                    {item.opportunityStage?.editEnabled && (
-                      <button onClick={() => saveDetails("opportunityStage")}>
+                    {item.opportunitySatge?.editEnabled && (
+                      <button onClick={() => saveDetails("opportunitySatge")}>
                         <Image
                           src="/images/save-icon.png"
                           alt="save-icon"
@@ -1296,13 +1315,13 @@ const DetailPage = () => {
                   </div>
                 </div>
                 <div className="mb-4">
-                  <label className="block text-base font-medium gap-2 text-gray-500">
+                  <label className="block text-base font-medium gap-2 text-black">
                     Demo attended Stage
                   </label>
                   <div className="flex">
                     <select
                       type=""
-                      className="w-full border-b-2 border-gray-300 p-2 rounded text-gray-800"
+                      className="w-full border-b-2 border-gray-300 p-2 rounded text-black font-medium"
                       placeholder=""
                       value={item.DemoAttendedStage?.value}
                       onChange={(e) => handleChange(e)}
@@ -1410,11 +1429,11 @@ const DetailPage = () => {
                   )}
                 </div>
                 <div className="mb-4">
-                  <label className="block text-sm font-medium">Email</label>
+                  <label className="block text-sm font-medium text-black">Email</label>
                   <div className="flex">
                     <input
                       type=""
-                      className="w-full border-b-2 border-gray-300 p-2 rounded"
+                      className="w-full border-b-2 border-gray-300 p-2 rounded text-black font-normal"
                       placeholder="Enter Email"
                       value={item.email?.value}
                       onChange={(e) => handleChange(e)}
@@ -1445,13 +1464,13 @@ const DetailPage = () => {
                   </div>
                 </div>
                 <div className="mb-4">
-                  <label className="block text-sm font-medium">
+                  <label className="block text-sm font-medium text-black">
                     Visited Stage
                   </label>
                   <div className="flex">
                     <select
                       type="text"
-                      className="w-full border-b-2 border-gray-300 p-2 rounded"
+                      className="w-full border-b-2 border-gray-300 p-2 rounded text-black font-normal"
                       placeholder=""
                       value={item.visitedStage?.value}
                       onChange={(e) => handleChange(e)}
@@ -1554,13 +1573,13 @@ const DetailPage = () => {
                   </div>
                 </div>
                 <div className="mb-4">
-                  <label className="block text-sm font-medium">
+                  <label className="block text-sm font-medium text-black">
                     Fee Quoted
                   </label>
                   <div className="flex">
                     <input
                       type="text"
-                      className="w-full border-b-2 border-gray-300 p-2 rounded"
+                      className="w-full border-b-2 border-gray-300 p-2 rounded text-black font-normal"
                       placeholder=""
                       value={item.feeQuoted?.value}
                       onChange={(e) => handleChange(e)}
@@ -1590,13 +1609,13 @@ const DetailPage = () => {
                   </div>
                 </div>
                 <div className="mb-4">
-                  <label className="block text-base font-medium gap-2 text-gray-500">
+                  <label className="block text-base font-medium gap-2 text-black">
                     Lost Opportunity Reason
                   </label>
                   <div className="flex">
                     <select
                       type=""
-                      className="w-full border-b-2 border-gray-300 p-2 text-gray-800"
+                      className="w-full border-b-2 border-gray-300 p-2 text-black font-normal"
                       placeholder=""
                       value={item.lostOpportunityReason?.value}
                       onChange={(e) => handleChange(e)}
@@ -1667,13 +1686,13 @@ const DetailPage = () => {
                   </div>
                 </div>
                 <div className="mb-4">
-                  <label className="block text-sm font-medium">
+                  <label className="block text-sm font-medium text-black">
                     Batch Timing
                   </label>
                   <div className="flex">
                     <input
                       type="text"
-                      className="w-full border-b-2 border-gray-300 p-2 rounded"
+                      className="w-full border-b-2 border-gray-300 p-2 rounded text-normal font-normal"
                       placeholder=""
                       value={item.batchTiming?.value}
                       onChange={(e) => handleChange(e)}
@@ -1703,13 +1722,13 @@ const DetailPage = () => {
                   </div>
                 </div>
                 <div className="mb-4">
-                  <label className="block text-sm font-medium">
+                  <label className="block text-sm font-medium text-black">
                     Next FollowUp
                   </label>
                   <div className="flex">
                     <input
                       type="datetime-local"
-                      className="w-full border-b-2 border-gray-300 p-2 rounded"
+                      className="w-full border-b-2 border-gray-300 p-2 rounded font-normal text-black"
                       placeholder=""
                       value={item.nextFollowUp?.value}
                       onChange={(e) => handleChange(e)}
@@ -1739,13 +1758,13 @@ const DetailPage = () => {
                   </div>
                 </div>
                 <div className="mb-4">
-                  <label className="block text-base font-medium gap-2 text-gray-500">
+                  <label className="block text-base font-medium gap-2 text-black">
                     Lead Status
                   </label>
                   <div className="flex">
                     <select
                       type=""
-                      className="w-full border-b-2 border-gray-300 p-2 text-gray-800"
+                      className="w-full border-b-2 border-gray-300 p-2 text-black font-normal"
                       placeholder=""
                       value={item.leadStatus?.value}
                       onChange={(e) => handleChange(e)}
@@ -1789,13 +1808,13 @@ const DetailPage = () => {
                   </div>
                 </div>
                 <div className="mb-4">
-                  <label className="block text-base font-medium gap-2 text-gray-500">
+                  <label className="block text-base font-medium gap-2 text-black">
                     Lead Source
                   </label>
                   <div className="flex">
                     <select
                       type=""
-                      className="w-full border-b-2 border-gray-300 p-2 text-gray-800"
+                      className="w-full border-b-2 border-gray-300 p-2 text-black font-normal"
                       placeholder=""
                       value={item.leadSource?.value}
                       onChange={(e) => handleChange(e)}
@@ -1874,13 +1893,13 @@ const DetailPage = () => {
                   </div>
                 </div>
                 <div className="mb-4">
-                  <label className="block text-base font-medium gap-2 text-gray-500">
+                  <label className="block text-base font-medium gap-2 text-black">
                     Stack
                   </label>
                   <div className="flex">
                     <select
                       type=""
-                      className="w-full border-b-2 border-gray-300 p-2 text-gray-800"
+                      className="w-full border-b-2 border-gray-300 p-2 text-black font-normal"
                       placeholder=""
                       value={item.stack?.value}
                       onChange={(e) => handleChange(e)}
@@ -1923,13 +1942,13 @@ const DetailPage = () => {
                   </div>
                 </div>
                 <div className="mb-4">
-                  <label className="block text-base font-medium gap-2 text-gray-500">
+                  <label className="block text-base font-medium gap-2 text-black">
                     Course
                   </label>
                   <div className="flex">
                     <input
                       type=""
-                      className="w-full border-b-2 border-gray-300 p-2 text-gray-800"
+                      className="w-full border-b-2 border-gray-300 p-2 text-black font-normal"
                       placeholder=""
                       value={item.course?.value}
                       onChange={(e) => handleChange(e)}
@@ -1959,13 +1978,13 @@ const DetailPage = () => {
                   </div>
                 </div>
                 <div className="mb-4">
-                  <label className="block text-base font-medium gap-2 text-gray-500">
+                  <label className="block text-base font-medium gap-2 text-black">
                     Class Mode
                   </label>
                   <div className="flex">
                     <select
                       type=""
-                      className="w-full border-b-2 border-gray-300 p-2 text-gray-800"
+                      className="w-full border-b-2 border-gray-300 p-2 text-black font-normal"
                       placeholder=""
                       value={item.ClassMode?.value}
                       onChange={(e) => handleChange(e)}
@@ -2015,13 +2034,13 @@ const DetailPage = () => {
                 </div>
 
                 <div className="mb-4">
-                  <label className="block text-sm font-medium">
+                  <label className="block text-sm font-medium text-black">
                     Description
                   </label>
                   <div className="flex">
                     <input
                       type="text"
-                      className="w-full border-b-2 border-gray-300 p-2 rounded"
+                      className="w-full border-b-2 border-gray-300 p-2 rounded text-black font-normal"
                       placeholder=""
                       value={item.description?.value}
                       onChange={(e) => handleChange(e)}
@@ -2086,7 +2105,10 @@ const DetailPage = () => {
                 </div>
 
                 <div className="mx-3 ">
-                  <button className="text-base bg-cyan-500 text-center px-3 py-1 border rounded-md">
+                <button
+                    className="text-base bg-cyan-500 text-center px-3 py-1 border rounded-md"
+                    onClick={() => handleConvert()}
+                  >
                     Convert
                   </button>
                 </div>
@@ -2115,13 +2137,13 @@ const DetailPage = () => {
             <div className="mt-40 pt-3 px-3 shadow-lg shadow-gray-400">
               <div className="grid grid-cols-2 gap-4 px-3">
                 <div className="mb-4">
-                  <label className="block text-base font-medium gap-2 text-gray-800 ">
+                  <label className="block text-base font-medium gap-2 text-black">
                     First Name
                   </label>
                   <div className="flex">
                     <input
                       type="text"
-                      className="w-full border-b-2 border-gray-300 p-2 rounded text-base font-medium"
+                      className="w-full border-b-2 border-gray-300 p-2 rounded text-base font-normal text-black"
                       placeholder=""
                       value={item.firstname?.value}
                       onChange={(e) => handleChange(e)}
@@ -2151,13 +2173,13 @@ const DetailPage = () => {
                   </div>
                 </div>
                 <div className="mb-4">
-                  <label className="block text-base font-medium gap-2 text-gray-500">
+                  <label className="block text-base font-medium gap-2 text-black">
                     Last Name
                   </label>
                   <div className="flex">
                     <input
                       type=""
-                      className="w-full border-b-2 border-gray-300 p-2 rounded text-gray-800"
+                      className="w-full border-b-2 border-gray-300 p-2 rounded text-black font-normal"
                       placeholder=""
                       value={item.lastname?.value}
                       onChange={(e) => handleChange(e)}
@@ -2187,13 +2209,13 @@ const DetailPage = () => {
                   </div>
                 </div>
                 <div className="mb-4">
-                  <label className="block text-base font-medium gap-2 text-gray-800 ">
+                  <label className="block text-base font-medium gap-2 text-black">
                     Id Proof
                   </label>
                   <div className="flex">
                     <input
                       type="text"
-                      className="w-full border-b-2 border-gray-300 p-2 rounded text-base font-medium"
+                      className="w-full border-b-2 border-gray-300 p-2 rounded text-base font-normal text-black"
                       placeholder=""
                       value={item.idProof?.value}
                       onChange={(e) => handleChange(e)}
@@ -2223,13 +2245,13 @@ const DetailPage = () => {
                   </div>
                 </div>
                 <div className="mb-4">
-                  <label className="block text-base font-medium gap-2 text-gray-500">
+                  <label className="block text-base font-medium gap-2 text-black">
                     Phone
                   </label>
                   <div className="flex">
                     <input
                       type=""
-                      className="w-full border-b-2 border-gray-300 p-2 rounded text-gray-800"
+                      className="w-full border-b-2 border-gray-300 p-2 rounded text-black font-normal"
                       placeholder=""
                       value={item.phone?.value}
                       onChange={(e) => handleChange(e)}
@@ -2259,11 +2281,11 @@ const DetailPage = () => {
                   </div>
                 </div>
                 <div className="mb-4">
-                  <label className="block text-sm font-medium">Phone</label>
+                  <label className="block text-sm font-medium text-black">Phone</label>
                   <div className="flex">
                     <input
                       type="text"
-                      className="w-full border-b-2 border-gray-300 p-2 rounded"
+                      className="w-full border-b-2 border-gray-300 p-2 rounded font-normal text-black"
                       placeholder=""
                       value={item.phone?.value}
                       onChange={(e) => handleChange(e)}
@@ -2294,13 +2316,13 @@ const DetailPage = () => {
                   </div>
                 </div>
                 <div className="mb-4">
-                  <label className="block text-base font-medium gap-2 text-gray-500">
+                  <label className="block text-base font-medium gap-2 text-black">
                     DOB
                   </label>
                   <div className="flex">
                     <input
                       type="date"
-                      className="w-full border-b-2 border-gray-300 p-2 rounded text-gray-800"
+                      className="w-full border-b-2 border-gray-300 p-2 rounded text-black font-normal"
                       placeholder=""
                       value={item.DOB?.value}
                       onChange={(e) => handleChange(e)}
@@ -2331,11 +2353,11 @@ const DetailPage = () => {
                   </div>
                 </div>
                 <div className="mb-4">
-                  <label className="block text-sm font-medium">Email</label>
+                  <label className="block text-sm font-medium text-black">Email</label>
                   <div className="flex">
                     <input
                       type=""
-                      className="w-full border-b-2 border-gray-300 p-2 rounded"
+                      className="w-full border-b-2 border-gray-300 p-2 rounded text-black font-normal"
                       placeholder="Enter Email"
                       value={item.email?.value}
                       onChange={(e) => handleChange(e)}
@@ -2365,13 +2387,13 @@ const DetailPage = () => {
                   </div>
                 </div>
                 <div className="mb-4">
-                  <label className="block text-sm font-medium">
+                  <label className="block text-sm font-medium text-black">
                     Registered Date
                   </label>
                   <div className="flex">
                     <input
                       type="date"
-                      className="w-full border-b-2 border-gray-300 p-2 rounded"
+                      className="w-full border-b-2 border-gray-300 p-2 rounded font-normal text-black"
                       placeholder=""
                       value={item.registeredDate?.value}
                       onChange={(e) => handleChange(e)}
@@ -2401,11 +2423,11 @@ const DetailPage = () => {
                   </div>
                 </div>
                 <div className="mb-4">
-                  <label className="block text-sm font-medium">Location</label>
+                  <label className="block text-sm font-medium text-black">Location</label>
                   <div className="flex">
                     <select
                       type="text"
-                      className="w-full border-b-2 border-gray-300 p-2 rounded"
+                      className="w-full border-b-2 border-gray-300 p-2 rounded text-black font-normal"
                       placeholder=""
                       value={item.location?.value}
                       onChange={(e) => handleChange(e)}
@@ -2442,13 +2464,13 @@ const DetailPage = () => {
                   </div>
                 </div>
                 <div className="mb-4">
-                  <label className="block text-base font-medium gap-2 text-gray-500">
+                  <label className="block text-base font-medium gap-2 text-black">
                     Batch Id&apos;s
                   </label>
                   <div className="flex">
                     <input
                       type=""
-                      className="w-full border-b-2 border-gray-300 p-2 text-gray-800"
+                      className="w-full border-b-2 border-gray-300 p-2 text-black font-normal"
                       placeholder=""
                       value={item.batchId?.value}
                       onChange={(e) => handleChange(e)}
@@ -2478,13 +2500,13 @@ const DetailPage = () => {
                   </div>
                 </div>
                 <div className="mb-4">
-                  <label className="block text-sm font-medium">
+                  <label className="block text-sm font-medium text-black">
                     Alternate Phone
                   </label>
                   <div className="flex">
                     <input
                       type="text"
-                      className="w-full border-b-2 border-gray-300 p-2 rounded"
+                      className="w-full border-b-2 border-gray-300 p-2 rounded text-black font-normal"
                       placeholder=""
                       value={item.alternatePhone?.value}
                       onChange={(e) => handleChange(e)}
@@ -2514,13 +2536,13 @@ const DetailPage = () => {
                   </div>
                 </div>
                 <div className="mb-4">
-                  <label className="block text-sm font-medium">
+                  <label className="block text-sm font-medium text-black">
                     Description
                   </label>
                   <div className="flex">
                     <input
-                      type="datetime-local"
-                      className="w-full border-b-2 border-gray-300 p-2 rounded"
+                      type="text"
+                      className="w-full border-b-2 border-gray-300 p-2 rounded text-black font-normal"
                       placeholder=""
                       value={item.description?.value}
                       onChange={(e) => handleChange(e)}
@@ -2550,13 +2572,13 @@ const DetailPage = () => {
                   </div>
                 </div>
                 <div className="mb-4">
-                  <label className="block text-base font-medium gap-2 text-gray-500">
+                  <label className="block text-base font-medium gap-2 text-black">
                     Exchange Rate
                   </label>
                   <div className="flex">
                     <input
                       type=""
-                      className="w-full border-b-2 border-gray-300 p-2 text-gray-800"
+                      className="w-full border-b-2 border-gray-300 p-2 text-black font-normal"
                       placeholder=""
                       value={item.exchangeRate?.value}
                       onChange={(e) => handleChange(e)}
@@ -2586,13 +2608,13 @@ const DetailPage = () => {
                   </div>
                 </div>
                 <div className="mb-4">
-                  <label className="block text-base font-medium gap-2 text-gray-500">
+                  <label className="block text-base font-medium gap-2 text-black">
                     Source
                   </label>
                   <div className="flex">
                     <input
                       type=""
-                      className="w-full border-b-2 border-gray-300 p-2 text-gray-800"
+                      className="w-full border-b-2 border-gray-300 p-2 text-black font-normal"
                       placeholder=""
                       value={item.source?.value}
                       onChange={(e) => handleChange(e)}
@@ -2622,13 +2644,13 @@ const DetailPage = () => {
                   </div>
                 </div>
                 <div className="mb-4">
-                  <label className="block text-base font-medium gap-2 text-gray-500">
+                  <label className="block text-base font-medium gap-2 text-black">
                     Attended Demo
                   </label>
                   <div className="flex">
                     <select
                       type=""
-                      className="w-full border-b-2 border-gray-300 p-2 text-gray-800"
+                      className="w-full border-b-2 border-gray-300 p-2 text-black font-normal"
                       placeholder=""
                       value={item.attendedDemo?.value}
                       onChange={(e) => handleChange(e)}
@@ -2731,13 +2753,13 @@ const DetailPage = () => {
                   </div>
                 </div>
                 <div className="mb-4">
-                  <label className="block text-base font-medium gap-2 text-gray-500">
+                  <label className="block text-base font-medium gap-2 text-black">
                     Learner Owner
                   </label>
                   <div className="flex">
                     <input
                       type=""
-                      className="w-full border-b-2 border-gray-300 p-2 text-gray-800"
+                      className="w-full border-b-2 border-gray-300 p-2 text-black font-normal"
                       placeholder=""
                       value={item.learnerOwner?.value}
                       onChange={(e) => handleChange(e)}
@@ -2767,91 +2789,24 @@ const DetailPage = () => {
                   </div>
                 </div>
                 <div className="mb-4">
-                  <label className="block text-base font-medium gap-2 text-gray-500">
+                  <label className="block text-base font-medium gap-2 text-black">
                     Learner Stage
                   </label>
                   <div className="flex">
                     <select
                       type=""
-                      className="w-full border-b-2 border-gray-300 p-2 text-gray-800"
+                      className="w-full border-b-2 border-gray-300 p-2 text-black font-normal"
                       placeholder=""
                       value={item.learnerStage?.value}
                       onChange={(e) => handleChange(e)}
                       disabled={!item.learnerStage?.editEnabled}
                       name="learnerStage"
                     >
-                      <option className="text-neutral-800" value="">
-                        Select Learner Stage
-                      </option>
-                      <option className="text-neutral-800" value="none">
-                        None
-                      </option>
-                      <option
-                        className="text-neutral-800"
-                        value="advancedDiscussion"
-                      >
-                        Advanced Discussion
-                      </option>
-                      <option className="text-neutral-800" value="readyToJoin">
-                        Ready To Join
-                      </option>
-                      <option
-                        className="text-neutral-800"
-                        value="callNotAnswered"
-                      >
-                        Call Not Answered
-                      </option>
-                      <option className="text-neutral-800" value="visiting">
-                        Visiting
-                      </option>
-                      <option
-                        className="text-neutral-800"
-                        value="feesNegotiation"
-                      >
-                        Fees Negotiation
-                      </option>
-                      <option
-                        className="text-neutral-800"
-                        value="batchAllocation"
-                      >
-                        Batch Allocation
-                      </option>
-                      <option
-                        className="text-neutral-800"
-                        value="needTimeThisWeek"
-                      >
-                        Need Time This Week
-                      </option>
-                      <option
-                        className="text-neutral-800"
-                        value="needTimeNextWeek"
-                      >
-                        Need Time Next Week
-                      </option>
-                      <option
-                        className="text-neutral-800"
-                        value="needTimeThisMonth"
-                      >
-                        Need Time This Month
-                      </option>
-                      <option
-                        className="text-neutral-800"
-                        value="needTimeNextMonth"
-                      >
-                        Need Time Next Month
-                      </option>
-                      <option
-                        className="text-neutral-800"
-                        value="specialRequirements"
-                      >
-                        Special Requirements
-                      </option>
-                      <option className="text-neutral-800" value="closedWon">
-                        Closed Won (Registered)
-                      </option>
-                      <option className="text-neutral-800" value="closedLost">
-                        Closed Lost (ColdLead)
-                      </option>
+                      <option className="text-neutral-800"value="">Select Learner Stage</option>
+                  <option className="text-neutral-800"value="upcoming">Upcoming</option>
+                  <option className="text-neutral-800"value="ongoing">Ongoing</option>
+                  <option className="text-neutral-800"value="onHold">On Hold</option>
+                  <option className="text-neutral-800"value="completed">Completed</option>
                     </select>
                     {!item.learnerStage?.editEnabled && (
                       <button onClick={() => enableEditable("learnerStage")}>
@@ -2876,11 +2831,11 @@ const DetailPage = () => {
                   </div>
                 </div>
                 <div className="mb-4">
-                  <label className="block text-sm font-medium">Currency</label>
+                  <label className="block text-sm font-medium text-black">Currency</label>
                   <div className="flex">
                     <input
                       type="text"
-                      className="w-full border-b-2 border-gray-300 p-2 rounded"
+                      className="w-full border-b-2 border-gray-300 p-2 rounded text-black font-normal"
                       placeholder=""
                       value={item.currency?.value}
                       onChange={(e) => handleChange(e)}
@@ -2910,13 +2865,13 @@ const DetailPage = () => {
                   </div>
                 </div>
                 <div className="mb-4">
-                  <label className="block text-sm font-medium">
+                  <label className="block text-sm font-medium text-black">
                     Counselling Done By
                   </label>
                   <div className="flex">
                     <input
                       type="text"
-                      className="w-full border-b-2 border-gray-300 p-2 rounded"
+                      className="w-full border-b-2 border-gray-300 p-2 rounded text-black font-normal"
                       placeholder=""
                       value={item.CounselingDoneBy?.value}
                       onChange={(e) => handleChange(e)}
@@ -2951,13 +2906,13 @@ const DetailPage = () => {
                 <h1 className="font-bold text2xl">Course Details</h1>
                 <br />
                 <div className="mb-4">
-                  <label className="block text-sm font-medium">
+                  <label className="block text-sm font-medium text-black">
                     Registered Course
                   </label>
                   <div className="flex">
                     <input
                       type="text"
-                      className="w-full border-b-2 border-gray-300 p-2 rounded"
+                      className="w-full border-b-2 border-gray-300 p-2 rounded text-black font-normal"
                       placeholder=""
                       value={item.registeredCourse?.value}
                       onChange={(e) => handleChange(e)}
@@ -2989,13 +2944,13 @@ const DetailPage = () => {
                   </div>
                 </div>
                 <div className="mb-4">
-                  <label className="block text-sm font-medium">
+                  <label className="block text-sm font-medium text-black">
                     Preferable Time
                   </label>
                   <div className="flex">
                     <input
                       type="text"
-                      className="w-full border-b-2 border-gray-300 p-2 rounded"
+                      className="w-full border-b-2 border-gray-300 p-2 rounded text-black font-normal"
                       placeholder=""
                       value={item.preferableTime?.value}
                       onChange={(e) => handleChange(e)}
@@ -3025,13 +2980,13 @@ const DetailPage = () => {
                   </div>
                 </div>
                 <div className="mb-4">
-                  <label className="block text-sm font-medium">
+                  <label className="block text-sm font-medium text-black">
                     Tech Stack
                   </label>
                   <div className="flex">
                     <input
                       type="text"
-                      className="w-full border-b-2 border-gray-300 p-2 rounded"
+                      className="w-full border-b-2 border-gray-300 p-2 rounded text-black font-normal"
                       placeholder=""
                       value={item.techStack?.value}
                       onChange={(e) => handleChange(e)}
@@ -3061,13 +3016,13 @@ const DetailPage = () => {
                   </div>
                 </div>
                 <div className="mb-4">
-                  <label className="block text-sm font-medium">
+                  <label className="block text-sm font-medium text-black">
                     Batch Timing
                   </label>
                   <div className="flex">
                     <input
-                      type="text"
-                      className="w-full border-b-2 border-gray-300 p-2 rounded"
+                      type="time"
+                      className="w-full border-b-2 border-gray-300 p-2 rounded text-black font-normal"
                       placeholder=""
                       value={item.batchTiming?.value}
                       onChange={(e) => handleChange(e)}
@@ -3097,13 +3052,13 @@ const DetailPage = () => {
                   </div>
                 </div>
                 <div className="mb-4">
-                  <label className="block text-sm font-medium">
+                  <label className="block text-sm font-medium text-black">
                     Course Comments
                   </label>
                   <div className="flex">
                     <input
                       type="text"
-                      className="w-full border-b-2 border-gray-300 p-2 rounded"
+                      className="w-full border-b-2 border-gray-300 p-2 rounded text-black font-normal"
                       placeholder=""
                       value={item.courseComments?.value}
                       onChange={(e) => handleChange(e)}
@@ -3133,13 +3088,13 @@ const DetailPage = () => {
                   </div>
                 </div>
                 <div className="mb-4">
-                  <label className="block text-sm font-medium">
+                  <label className="block text-sm font-medium text-black">
                     Mode Of Class
                   </label>
                   <div className="flex">
                     <select
                       type="text"
-                      className="w-full border-b-2 border-gray-300 p-2 rounded"
+                      className="w-full border-b-2 border-gray-300 p-2 rounded text-black font-normal"
                       placeholder=""
                       value={item.modeOfClass?.value}
                       onChange={(e) => handleChange(e)}
@@ -3181,13 +3136,13 @@ const DetailPage = () => {
                   </div>
                 </div>
                 <div className="mb-4">
-                  <label className="block text-sm font-medium">
+                  <label className="block text-sm font-medium text-black">
                     Slack Access
                   </label>
                   <div className="flex">
                     <input
                       type="text"
-                      className="w-full border-b-2 border-gray-300 p-2 rounded"
+                      className="w-full border-b-2 border-gray-300 p-2 rounded text-black font-normal"
                       placeholder=""
                       value={item.slackAccess?.value}
                       onChange={(e) => handleChange(e)}
@@ -3217,11 +3172,11 @@ const DetailPage = () => {
                   </div>
                 </div>
                 <div className="mb-4">
-                  <label className="block text-sm font-medium">Comment</label>
+                  <label className="block text-sm font-medium text-black">Comment</label>
                   <div className="flex">
                     <input
                       type="text"
-                      className="w-full border-b-2 border-gray-300 p-2 rounded"
+                      className="w-full border-b-2 border-gray-300 p-2 rounded text-black font-normal"
                       placeholder=""
                       value={item.Comment?.value}
                       onChange={(e) => handleChange(e)}
@@ -3251,13 +3206,13 @@ const DetailPage = () => {
                   </div>
                 </div>
                 <div className="mb-4">
-                  <label className="block text-sm font-medium">
+                  <label className="block text-sm font-medium text-black">
                     LMS Access
                   </label>
                   <div className="flex">
                     <input
                       type="text"
-                      className="w-full border-b-2 border-gray-300 p-2 rounded"
+                      className="w-full border-b-2 border-gray-300 p-2 rounded text-black font-normal"
                       placeholder=""
                       value={item.lMSAccess?.value}
                       onChange={(e) => handleChange(e)}
@@ -3341,13 +3296,13 @@ const DetailPage = () => {
             <div className="mt-40 pt-3 px-3 shadow-lg shadow-gray-400">
               <div className="grid grid-cols-2 gap-4 px-3">
                 <div className="mb-4">
-                  <label className="block text-base font-medium gap-2 text-gray-800 ">
+                  <label className="block text-base font-medium gap-2  text-black">
                     Course Name
                   </label>
                   <div className="flex">
                     <input
                       type="text"
-                      className="w-full border-b-2 border-gray-300 p-2 rounded text-base font-medium"
+                      className="w-full border-b-2 border-gray-300 p-2 rounded text-base font-normal text-black"
                       placeholder=""
                       value={item.courseName?.value}
                       onChange={(e) => handleChange(e)}
@@ -3377,13 +3332,13 @@ const DetailPage = () => {
                   </div>
                 </div>
                 <div className="mb-4">
-                  <label className="block text-base font-medium gap-2 text-gray-500">
+                  <label className="block text-base font-medium gap-2  text-black">
                     Description
                   </label>
                   <div className="flex">
                     <input
                       type=""
-                      className="w-full border-b-2 border-gray-300 p-2 rounded text-gray-800"
+                      className="w-full border-b-2 border-gray-300 p-2 rounded  text-black font-normal"
                       placeholder=""
                       value={item.description?.value}
                       onChange={(e) => handleChange(e)}
@@ -3413,13 +3368,13 @@ const DetailPage = () => {
                   </div>
                 </div>
                 <div className="mb-4">
-                  <label className="block text-base font-medium gap-2 text-gray-800 ">
+                  <label className="block text-base font-medium gap-2  text-black">
                     Course Fee
                   </label>
                   <div className="flex">
                     <input
                       type="text"
-                      className="w-full border-b-2 border-gray-300 p-2 rounded text-base font-medium"
+                      className="w-full border-b-2 border-gray-300 p-2 rounded text-base font-normal text-black"
                       placeholder=""
                       value={item.courseFee?.value}
                       onChange={(e) => handleChange(e)}

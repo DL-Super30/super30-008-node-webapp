@@ -79,9 +79,10 @@ export default function Modal({ isOpen, onClose, type, addNewItem }) {
 
   const [coursesData, setCoursesData] = useState({
     
-    course: "",
+    courseName: "",
     description: "",
     courseFee: "",
+    courseBrochure: "",
    
   });
 
@@ -140,6 +141,7 @@ console.log('yes');
         </div>
         <form onSubmit={handleSubmit} className="grid grid-cols-2 gap-4 ">
           {/* Form Fields for Leads */}
+
           {type === "leads" && (
             <>
               <div className="mb-4">
@@ -177,7 +179,7 @@ console.log('yes');
                 <input
                   type="text"
                   className="w-full border-b-2 border-gray-300 p-2 rounded text-base font-medium focus-visible:outline-none "
-                  placeholder=""
+                  placeholder="cc"
                   value={leadsData.cc}
                   name="cc"
                   onChange={handleChange}
@@ -336,6 +338,7 @@ console.log('yes');
           )}
 
           {/* Form Fields for Opportunities */}
+
           {type === "opportunities" && (
             <>
               <div className="mb-4">
@@ -686,6 +689,7 @@ console.log('yes');
           )}
 
           {/* Form Fields for Learners */}
+
           {type === "learners" && (
             <>
               <div className="mb-4">
@@ -1113,6 +1117,7 @@ console.log('yes');
           )}
 
           {/* Form Fields for Courses */}
+
           {type === "courses" && (
             <>
               <div className="mb-4">
@@ -1129,21 +1134,36 @@ console.log('yes');
               </div>
               <div className="mb-4">
                 <label className="block text-sm font-medium">Description</label>
-                <textarea
+                <input
+                type="text"
                   className="w-full border-b-2 border-gray-300 p-2 rounded text-base font-medium focus-visible:outline-none "
                   placeholder="Enter course description"
                   value={coursesData.description}
+                  name="description"
                 onChange={handleChange}
                 required
-                ></textarea>
+                />
               </div>
               <div className="mb-4">
                 <label className="block text-sm font-medium">Course Fee</label>
                 <input
-                  type="number"
+                  type="text"
                   className="w-full border-b-2 border-gray-300 p-2 rounded text-base font-medium focus-visible:outline-none "
                   placeholder="Enter course fee"
                   value={coursesData.courseFee}
+                  name="courseFee"
+                onChange={handleChange}
+                required
+                />
+              </div>
+              <div className="mb-4">
+                <label className="block text-sm font-medium">Course Brochure</label>
+                <input
+                  type="text"
+                  className="w-full border-b-2 border-gray-300 p-2 rounded text-base font-medium focus-visible:outline-none "
+                  placeholder="Enter course Brochure"
+                  value={coursesData.courseBrochure}
+                  name="courseBrochure"
                 onChange={handleChange}
                 required
                 />

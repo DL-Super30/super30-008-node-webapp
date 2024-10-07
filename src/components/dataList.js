@@ -29,6 +29,11 @@ import {
   deleteLearnerApi,
   getlearnerApi,
 } from "@/slices/learnersSlice";
+import {
+  createCourseApi,
+  deleteCourseApi,
+  getCourseApi,
+} from "@/slices/coursesSlice";
 
 const DataList = ({ type, items }) => {
   const ITEMS_PER_PAGE = 15;
@@ -100,6 +105,8 @@ const DataList = ({ type, items }) => {
       dispatch(getOpportunityApi());
     } else if (type === "learners") {
       dispatch(getlearnerApi());
+    } else if (type === "courses") {
+      dispatch(getCourseApi());
     }
   }, [newDataItem?.newItem, newDataItem?.deleteItem]);
 
@@ -125,6 +132,8 @@ const DataList = ({ type, items }) => {
           dispatch(deleteOpportunityApi(item.id));
         } else if (type === "learners") {
           dispatch(deleteLearnerApi(item.id));
+        } else if (type === "courses") {
+          dispatch(deleteCourseApi(item.id));
         }
       });
     }
@@ -140,6 +149,11 @@ const DataList = ({ type, items }) => {
       selectedPage * ITEMS_PER_PAGE
     );
     setFilteredDataList(currentDataList ?? []);
+    const totalItems = currentDataList?.length;
+    const totalPages = Math.ceil(totalItems / ITEMS_PER_PAGE);
+    console.log(totalItems, totalPages);
+    setTotalItems(totalItems);
+    setTotalPages(totalPages);
   };
 
   const filterItemsByDate = (items, option) => {
@@ -285,7 +299,7 @@ const DataList = ({ type, items }) => {
   const handleSearchQuery = (searchQuery) => {
     const filterDataList = dataList?.filter((item) =>
       type === "courses"
-        ? item?.course?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        ? item?.courseName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
           item.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
           item.courseFee.toString().includes(searchQuery)
         : item?.leadname?.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -324,6 +338,7 @@ const DataList = ({ type, items }) => {
 
       dispatch(createLeadsApi(itemToBeAdded));
       dispatch(getLeadsApi());
+
     } else if (type === "opportunities") {
       const itemToBeAdded = {
         name: newItem.name,
@@ -348,6 +363,7 @@ const DataList = ({ type, items }) => {
 
       dispatch(createOpportunityApi(itemToBeAdded));
       dispatch(getOpportunityApi());
+
     } else if (type === "learners") {
       const itemToBeAdded = {
         firstname: newItem.firstname,
@@ -383,6 +399,17 @@ const DataList = ({ type, items }) => {
 
       dispatch(createLearnerApi(itemToBeAdded));
       dispatch(getlearnerApi());
+    } else if (type === "courses") {
+      const itemToBeAdded = {
+        courseName: newItem.courseName,
+        courseFee: newItem.courseFee,
+        description: newItem.description,
+        courseBrochure: newItem.courseBrochure,
+      };
+      console.log(newItem);
+
+      dispatch(createCourseApi(itemToBeAdded));
+      dispatch(getCourseApi());
     }
   };
 
@@ -394,7 +421,13 @@ const DataList = ({ type, items }) => {
       filterDataList = [...dataList];
       setSelectedStatus("");
     } else {
-      filterDataList = dataList?.filter((item) => item.leadStatus === status);
+      if (type === 'leads') {
+        filterDataList = dataList?.filter((item) => item.leadStatus === status);
+      } else if (type === 'opportunities'){
+      filterDataList = dataList?.filter((item) => item.opportunityStatus === status);
+    } else if (type === 'learners') {
+      filterDataList = dataList?.filter((item) => item.learnerStage === status);
+    }
       setSelectedStatus(status);
     }
 
@@ -426,12 +459,23 @@ const DataList = ({ type, items }) => {
       return item.name;
     } else if (type === "learners") {
       return item.lastname;
+    } else if (type === "courses") {
+      return item.courseName;
     }
   };
 
   const handleRowClick = (itemID) => {
     router.push(`/details/${itemID}?type=${type}`); // Navigates to details page
   };
+
+  const colorClasses = [
+    "bg-green-600",
+    "bg-blue-400",
+    "bg-yellow-400",
+    "bg-purple-500",
+    "bg-pink-500",
+    "bg-lime-500",
+  ]; 
 
   return (
     <div className="m-3 mx-5">
@@ -471,7 +515,7 @@ const DataList = ({ type, items }) => {
             <div>
               <button
                 onClick={openModal}
-                className="flex items-center border rounded-md px-4 py-1 gap-1"
+                className="flex items-center border rounded-md px-4 py-1 gap-1 bg-sky-600"
               >
                 {`Create ${type.charAt(0).toUpperCase() + type.slice(1)}`}
 
@@ -642,11 +686,16 @@ const DataList = ({ type, items }) => {
           ) : (
             ""
           )}
+          
 
           {type !== 'courses' && <div className="flex items-center">
             <button
               onClick={() => toggleViewMode("table")}
-              className="flex border rounded-l-lg py-1 px-4 gap-2 w-1/2 border-gray-600"
+              className={`flex border rounded-l-lg py-1 px-4 gap-2 w-1/2 border-gray-600 ${
+                viewMode === "table"
+                  ? "bg-sky-600 text-white"
+                  : "bg-white text-black"
+              }`}
             >
               <Image
                 src="/images/table-icon.png"
@@ -659,7 +708,11 @@ const DataList = ({ type, items }) => {
             </button>
             <button
               onClick={() => toggleViewMode("kanban")}
-              className="flex border rounded-r-lg py-1 px-4 gap-2 w-1/2 border-gray-600 hover: bg-blue"
+              className={`flex border rounded-r-lg py-1 px-4 gap-2 w-1/2 border-gray-600 ${
+                viewMode === "kanban"
+                  ? "bg-sky-600 text-white"
+                  : "bg-white text-black"
+              }`}
             >
               <Image
                 src="/images/kanban-icon.png"
@@ -677,62 +730,72 @@ const DataList = ({ type, items }) => {
           <div className="p-4 flex-grow overflow-hidden ">
             <div className="h-full overflow-y-auto ">
               <table className=" border border-gray-300 w-full table-auto">
-                <thead className="border border-gray-300 h-12 bg-gray-100">
-                  <tr className="text-left">
-                    <th>
-                      <input type="checkbox" className="form-checkbox" />
+                <thead className="border border-gray-300 ">
+                  <tr className="text-center h-12 bg-gray-100 font-medium text-base">
+                    <th className="p-2">
+                      <input type="checkbox" className="form-checkbox " />
                     </th>
                     {type === "courses" ? (
                       <>
-                        <th>Course</th>
-                        <th>Description</th>
-                        <th>Course Fee</th>
+                        <th className="border-r border-gray-400 p-2">Course</th>
+                        <th className="border-r border-gray-400 p-2">
+                          Description
+                        </th>
+                        <th className="border-r border-gray-400 p-2">
+                          Course Fee
+                        </th>
                       </>
                     ) : type === "learners" ? (
                       <>
-                        <th className="border-r border-gray-400 ">
+                        <th className="border-r border-gray-400 p-2">
                           Created Time
                         </th>
-                        <th className="border-r border-gray-400 ">
+                        <th className="border-r border-gray-400 p-2">
                           Registered Date
                         </th>
-                        <th className="border-r border-gray-400 ">Last Name</th>
-                        <th className="border-r border-gray-400 ">Phone</th>
-                        <th className="border-r border-gray-400 ">Email</th>
-                        <th className="border-r border-gray-400 ">
+                        <th className="border-r border-gray-400 p-2">
+                          Last Name
+                        </th>
+                        <th className="border-r border-gray-400 p-2">Phone</th>
+                        <th className="border-r border-gray-400 p-2">Email</th>
+                        <th className="border-r border-gray-400 p-2">
                           Mode of Class
                         </th>
-                        <th className="border-r border-gray-400 ">
+                        <th className="border-r border-gray-400 p-2">
                           Tech Stack
                         </th>
-                        <th className="border-r border-gray-400 ">Learner stage</th>
-                        <th className="border-r border-gray-400 ">Total Fee</th>
+                        <th className="border-r border-gray-400 p-2">
+                          Learner stage
+                        </th>
+                        <th className="border-r border-gray-400 p-2">
+                          Total Fee
+                        </th>
                       </>
                     ) : type === "leads" ? (
                       <>
-                        <th className="border-r border-gray-400 ">
+                        <th className="border-r border-gray-400 p-2">
                           Created on
                         </th>
-                        <th className="border-r border-gray-400 ">
+                        <th className="border-r border-gray-400 p-2">
                           Lead Status
                         </th>
-                        <th className="border-r border-gray-400 ">Name</th>
-                        <th className="border-r border-gray-400 ">Phone</th>
-                        <th className="border-r border-gray-400 ">Stack</th>
+                        <th className="border-r border-gray-400 p-2">Name</th>
+                        <th className="border-r border-gray-400 p-2">Phone</th>
+                        <th className="border-r border-gray-400 p-2">Stack</th>
                         <th className="w-50">Course</th>
                       </>
                     ) : (
                       <>
-                        <th className="border-r border-gray-400 ">
+                        <th className="border-r border-gray-400 p-2">
                           Created on
                         </th>
-                        <th className="border-r border-gray-400 ">
+                        <th className="border-r border-gray-400 p-2">
                           Opportunity Status
                         </th>
-                        <th className="border-r border-gray-400 ">Name</th>
-                        <th className="border-r border-gray-400 ">Phone</th>
-                        <th className="border-r border-gray-400 ">Stack</th>
-                        <th className="w-50">Course</th>
+                        <th className="border-r border-gray-400 p-2">Name</th>
+                        <th className="border-r border-gray-400 p-2">Phone</th>
+                        <th className="border-r border-gray-400 p-2">Stack</th>
+                        <th className="border-r border-gray-400 p-2">Course</th>
                       </>
                     )}
                   </tr>
@@ -741,11 +804,11 @@ const DataList = ({ type, items }) => {
                   {filteredDataList?.map((item) => (
                     <tr
                       key={item.id}
-                      className="cursor-pointer"
+                      className="cursor-pointer odd:bg-white even:bg-slate-50 border-b hover:bg-cyan-50 text-sm "
                       onClick={() => handleRowClick(item.id)}
                     >
                       <td
-                        className="text-left font-normal"
+                        className="text-left font-normal p-2"
                         onClick={(e) => e.stopPropagation()}
                       >
                         <input
@@ -757,85 +820,85 @@ const DataList = ({ type, items }) => {
 
                       {type === "courses" ? (
                         <>
-                          <td className="text-left font-normal">
-                            {item.course}
+                          <td className="text-left font-normal p-2 ">
+                            {getName(item)}
                           </td>
-                          <td className="text-left font-normal">
+                          <td className="text-left font-normal p-2">
                             {item.description}
                           </td>
-                          <td className="text-left font-normal">
+                          <td className="text-left font-normal p-2">
                             {item.courseFee}
                           </td>
                         </>
                       ) : type === "learners" ? (
                         <>
-                          <td className="text-left font-normal">
+                          <td className="text-left font-normal p-2">
                             {item.createdAt}
                           </td>
-                          <td className="text-left font-normal">
+                          <td className="text-left font-normal p-2">
                             {item.registeredDate}
                           </td>
-                          <td className="text-left font-normal">
-                            {item.lastname}
+                          <td className="text-left font-normal p-2">
+                            {getName(item)}
                           </td>
-                          <td className="text-left font-normal">
+                          <td className="text-left font-normal p-2">
                             {item.phone}
                           </td>
-                          <td className="text-left font-normal">
+                          <td className="text-left font-normal p-2">
                             {item.email}
                           </td>
-                          <td className="text-left font-normal">
+                          <td className="text-left font-normal p-2">
                             {item.modeOfClass}
                           </td>
-                          <td className="text-left font-normal">
+                          <td className="text-left font-normal p-2">
                             {item.techStack}
                           </td>
-                          <td className="text-left font-normal">
+                          <td className="text-left font-normal p-2">
                             {item.learnerStage}
                           </td>
-                          <td className="text-left font-normal">
+                          <td className="text-left font-normal p-2">
                             {item.currency}
                           </td>
                         </>
                       ) : type === "leads" ? (
                         <>
-                          <td className="text-left font-normal">
+                          <td className="text-left font-normal p-2">
                             {item.createdAt}
                           </td>
-                          <td className="text-left font-normal">
+                          <td className="text-left font-normal p-2">
                             {item.leadStatus}
                           </td>
-                          <td className="text-left font-normal">
+                          <td className="text-left font-normal p-2">
                             {getName(item)}
                           </td>
-                          <td className="text-left font-normal">
+                          <td className="text-left font-normal p-2">
                             {item.phone}
                           </td>
-                          <td className="text-left font-normal">
+                          <td className="text-left font-normal p-2">
                             {item.stack}
                           </td>
-                          <td className="text-left font-normal">
+                          <td className="text-left font-normal p-2">
                             {item.course}
                           </td>
                         </>
                       ) : (
                         <>
-                          <td className="text-left font-normal">
+                          <td className="text-left font-normal p-2">
                             {item.createdAt}
                           </td>
-                          <td className="text-left font-normal">
+                          <td className="text-left font-normal p-2">
                             {item.opportunityStatus}
                           </td>
-                          <td className="text-left font-normal">
+                          <td className="text-left font-normal p-2">
                             {getName(item)}
                           </td>
-                          <td className="text-left font-normal">
+                          <td className="text-left font-normal p-2">
                             {item.phone}
                           </td>
-                          <td className="text-left font-normal">
+                          <td className="text-left font-normal p-2">
                             {item.stack}
                           </td>
-                          <td className="text-left font-normal">
+                          <td className="text-left font-normal p-2">
                             {item.course}
                           </td>
                         </>
@@ -883,11 +946,11 @@ const DataList = ({ type, items }) => {
                     <h3 className="text-base font-semibold">{status}</h3>
                     <p className="text-sm font-semibold">
                       ₹ {kanbanDataView?.[status]}
-                      <span className="text-sm font-medium"> Leads</span>
+                      <span className="text-sm font-medium">{`${type.charAt(0).toUpperCase() + type.slice(1)}`}</span>
                     </p>
                   </div>
-                  <div className="bg-gray-200 h-80 p-2 max-w-96 flex rounded">
-                    <div className="flex flex-col">
+                  <div className="bg-gray-200 h-80 p-2 max-w-96 flex rounded-lg overflow-y-auto">
+                    <div className="flex flex-col ml-5 gap-1">
                       {filteredDataList
                         .filter(
                           (item) =>
@@ -895,30 +958,30 @@ const DataList = ({ type, items }) => {
                             item.opportunityStatus === status ||
                             item.learnerStage === status
                         )
-                        .map((item) => (
+                        .map((item, index) => (
                           <div
                             key={item.id}
-                            className="text-base"
+                            className={`text-black rounded-lg font-normal ${colorClasses[index % colorClasses.length]}`}
                             onClick={() => handleRowClick(item.id)}
                           >
-                            <div className="flex flex-row gap-1">
-                              <p className="flex flex-row">
-                                Name: <span>{getName(item)}</span>
-                              </p>
-                              <p>
-                                Phone:<span>{item.phone}</span>
-                              </p>
+                            <div className="flex flex-col">
+                              <div className="w-80 flex flex-row border border-b border-gray-500">
+                                <p className="w-1/2 border-r-2 border-gray-500 p-1">Name:</p> <span className="p-1">{getName(item)}</span>
+                              </div>
+                              <div className="w-80 flex flex-row border border-b border-gray-500"> 
+                              <p className="w-1/2 border-r-2 border-gray-500 p-1">Phone:</p><span className="p-1">{item.phone}</span>
+                              </div>
                               {type === "learners" ? (
                                 <>
-                                  <p>
-                                    Total Fee: <span>{item.currency}</span>/-
-                                  </p>
+                                  <div className="w-80 flex flex-row border border-b border-gray-500">
+                                  <p className="w-1/2 border-r-2 border-gray-500 p-1">Total Fee: </p><span className="p-1">{`${item.currency}/-`}</span>
+                                  </div>
                                 </>
                               ) : (
                                 <>
-                                  <p>
-                                    Fee: <span>{item.feeQuoted}</span>/-
-                                  </p>
+                                  <div className="w-80 flex flex-row border border-b border-gray-500">
+                                  <p className="w-1/2 border-r-2 border-gray-500 p-1">Fee: </p><span className="p-1">{`${item.feeQuoted}/-`}</span>
+                                  </div>
                                 </>
                               )}
                             </div>

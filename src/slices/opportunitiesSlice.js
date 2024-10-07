@@ -54,6 +54,19 @@ export const deleteOpportunityApi = createAsyncThunk('deleteOpportunityApi', asy
     }
 });
 
+export const convertOpportunityApi = createAsyncThunk('convertOpportunityApi', async (payload) => {
+    try {
+        const response = await axios.post('http://localhost:4000/api/opportunity/' + payload.id + '/convert', {convertTo: payload.convertTo});
+        return response;
+    } catch(error) {
+        if (error.response) {
+            return error.response;
+        } else {
+            return error.message;
+        }
+    }
+});
+
 const getInitialOpportunitiesState = () => {
     return { isLoading: false, error: null, opportunities: [], newItem: {}, deleteItem: {} };
   };

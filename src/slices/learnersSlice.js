@@ -54,6 +54,19 @@ export const deleteLearnerApi = createAsyncThunk('deleteLearnerApi', async (id) 
     }
 });
 
+export const convertLearnerApi = createAsyncThunk('convertLearnerApi', async (payload) => {
+    try {
+        const response = await axios.post('http://localhost:4000/api/learner/' + payload.id + '/convert', {convertTo: payload.convertTo});
+        return response;
+    } catch(error) {
+        if (error.response) {
+            return error.response;
+        } else {
+            return error.message;
+        }
+    }
+});
+
 const getInitialLearnersState = () => {
     return { isLoading: false, error: null, learners: [], newItem: {}, deleteIte: {} };
   };

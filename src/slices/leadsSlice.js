@@ -67,9 +67,9 @@ export const deleteLeadsApi = createAsyncThunk('deleteLeadsApi', async (id) => {
     }
 });
 
-export const convertLeadsApi = createAsyncThunk('convertLeadsApi', async (id) => {
+export const convertLeadsApi = createAsyncThunk('convertLeadsApi', async (payload) => {
     try {
-        const response = await axios.post('http://localhost:4000/api/leads/' + id + '/convert', {});
+        const response = await axios.post('http://localhost:4000/api/leads/' + payload.id + '/convert', {convertTo: payload.convertTo});
         return response;
     } catch(error) {
         if (error.response) {
