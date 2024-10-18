@@ -334,6 +334,7 @@ const DataList = ({ type, items }) => {
         leadSource: newItem.leadSource,
         course: newItem.course,
         selectedClassMode: newItem.classMode,
+        stack: newItem.stack
       };
 
       dispatch(createLeadsApi(itemToBeAdded));
@@ -469,18 +470,14 @@ const DataList = ({ type, items }) => {
   };
 
   const colorClasses = [
-    "bg-green-600",
-    "bg-blue-400",
-    "bg-yellow-400",
-    "bg-purple-500",
-    "bg-pink-500",
-    "bg-lime-500",
+    "bg-pink-50",
+    "bg-lime-50",
   ]; 
 
   return (
-    <div className="m-3 mx-5">
+    <div className="m-3 mx-5 sm:mx-3 lg:mx-5">
       <div className="border border-gray-300 border-2 shadow rounded-md w-full h-screen relative flex flex-col">
-        <div className="mx-3 my-4 flex justify-between">
+      <div className="mx-3 my-4 flex flex-col md:flex-row justify-between">
           <div className="flex items-center gap-3">
             <Image
               src="/images/employee_contact.svg"
@@ -488,10 +485,10 @@ const DataList = ({ type, items }) => {
               width={40}
               height={30}
             />
-            <h1 className="flex items-center text-2xl gap-2 text-sky-950">
+            <h1 className="flex items-center text-xl md:text-2xl gap-2 text-sky-950">
               {selectedOption}
               <FaChevronDown
-                className="text-2xl font-light"
+                className="text-xl sm:text-2xl font-light"
                 onClick={handleToggle}
               />
 
@@ -511,7 +508,7 @@ const DataList = ({ type, items }) => {
               )}
             </h1>
           </div>
-          <div className="flex items center gap-2 ">
+          <div className="flex flex-col sm:flex-row items-center gap-2 mt-4 md:mt-0">
             <div>
               <button
                 onClick={openModal}
@@ -519,7 +516,7 @@ const DataList = ({ type, items }) => {
               >
                 {`Create ${type.charAt(0).toUpperCase() + type.slice(1)}`}
 
-                <FaChevronDown className="ml-1 text-xs items-center font-thin" />
+                <FaChevronDown className="ml-1 text-xs sm:text-sm items-center font-thin" />
               </button>
               <Modal
                 isOpen={isModalOpen}
@@ -556,7 +553,7 @@ const DataList = ({ type, items }) => {
           </div>
         </div>
 
-        <div className="flex gap-5 items-center ">
+        <div className="flex flex-col md:flex-row gap-5 items-center">
           <div className="items-center">
             <input
               type="text"
@@ -732,7 +729,7 @@ const DataList = ({ type, items }) => {
               <table className=" border border-gray-300 w-full table-auto">
                 <thead className="border border-gray-300 ">
                   <tr className="text-center h-12 bg-gray-100 font-medium text-base">
-                    <th className="p-2">
+                    <th className="border-r border-gray-400 p-2">
                       <input type="checkbox" className="form-checkbox " />
                     </th>
                     {type === "courses" ? (
@@ -800,15 +797,15 @@ const DataList = ({ type, items }) => {
                     )}
                   </tr>
                 </thead>
-                <tbody className="text-left font-normal">
+                <tbody className="text-center font-normal">
                   {filteredDataList?.map((item) => (
                     <tr
                       key={item.id}
-                      className="cursor-pointer odd:bg-white even:bg-slate-50 border-b hover:bg-cyan-50 text-sm "
+                      className="cursor-pointer odd:bg-white even:bg-slate-50 border-b hover:bg-cyan-50 text-sm"
                       onClick={() => handleRowClick(item.id)}
                     >
                       <td
-                        className="text-left font-normal p-2"
+                        className="text-center font-normal border-r border-gray-400 p-2"
                         onClick={(e) => e.stopPropagation()}
                       >
                         <input
@@ -820,85 +817,85 @@ const DataList = ({ type, items }) => {
 
                       {type === "courses" ? (
                         <>
-                          <td className="text-left font-normal p-2 ">
+                          <td className="text-center font-normal border-r border-gray-400 p-2">
                             {getName(item)}
                           </td>
-                          <td className="text-left font-normal p-2">
+                          <td className="text-center font-normal border-r border-gray-400 p-2">
                             {item.description}
                           </td>
-                          <td className="text-left font-normal p-2">
+                          <td className="text-center font-normal border-r border-gray-400 p-2">
                             {item.courseFee}
                           </td>
                         </>
                       ) : type === "learners" ? (
                         <>
-                          <td className="text-left font-normal p-2">
+                          <td className="text-center font-normal border-r border-gray-400 p-2">
                             {item.createdAt}
                           </td>
-                          <td className="text-left font-normal p-2">
+                          <td className="text-center font-normal border-r border-gray-400 p-2">
                             {item.registeredDate}
                           </td>
-                          <td className="text-left font-normal p-2">
+                          <td className="text-center font-normal border-r border-gray-400 p-2">
                             {getName(item)}
                           </td>
-                          <td className="text-left font-normal p-2">
+                          <td className="text-center font-normal border-r border-gray-400 p-2">
                             {item.phone}
                           </td>
-                          <td className="text-left font-normal p-2">
+                          <td className="text-center font-normal border-r border-gray-400 p-2">
                             {item.email}
                           </td>
-                          <td className="text-left font-normal p-2">
+                          <td className="text-center font-normal border-r border-gray-400 p-2">
                             {item.modeOfClass}
                           </td>
-                          <td className="text-left font-normal p-2">
+                          <td className="text-center font-normal border-r border-gray-400 p-2">
                             {item.techStack}
                           </td>
-                          <td className="text-left font-normal p-2">
+                          <td className="text-center font-normal border-r border-gray-400 p-2">
                             {item.learnerStage}
                           </td>
-                          <td className="text-left font-normal p-2">
+                          <td className="text-center font-normal border-r border-gray-400 p-2">
                             {item.currency}
                           </td>
                         </>
                       ) : type === "leads" ? (
                         <>
-                          <td className="text-left font-normal p-2">
+                          <td className="text-center font-normal border-r border-gray-400 p-2">
                             {item.createdAt}
                           </td>
-                          <td className="text-left font-normal p-2">
+                          <td className="text-center font-normal border-r border-gray-400 p-2">
                             {item.leadStatus}
                           </td>
-                          <td className="text-left font-normal p-2">
+                          <td className="text-center font-normal border-r border-gray-400 p-2">
                             {getName(item)}
                           </td>
-                          <td className="text-left font-normal p-2">
+                          <td className="text-center font-normal border-r border-gray-400 p-2">
                             {item.phone}
                           </td>
-                          <td className="text-left font-normal p-2">
+                          <td className="text-center font-normal border-r border-gray-400 p-2">
                             {item.stack}
                           </td>
-                          <td className="text-left font-normal p-2">
+                          <td className="text-center font-normal border-r border-gray-400 p-2">
                             {item.course}
                           </td>
                         </>
                       ) : (
                         <>
-                          <td className="text-left font-normal p-2">
+                          <td className="text-center font-normal border-r border-gray-400 p-2">
                             {item.createdAt}
                           </td>
-                          <td className="text-left font-normal p-2">
+                          <td className="text-center font-normal border-r border-gray-400 p-2">
                             {item.opportunityStatus}
                           </td>
-                          <td className="text-left font-normal p-2">
+                          <td className="text-center font-normal border-r border-gray-400 p-2">
                             {getName(item)}
                           </td>
-                          <td className="text-left font-normal p-2">
+                          <td className="text-center font-normal border-r border-gray-400 p-2">
                             {item.phone}
                           </td>
-                          <td className="text-left font-normal p-2">
+                          <td className="text-center font-normal border-r border-gray-400 p-2">
                             {item.stack}
                           </td>
-                          <td className="text-left font-normal p-2">
+                          <td className="text-center font-normal border-r border-gray-400 p-2">
                             {item.course}
                           </td>
                         </>
@@ -965,22 +962,22 @@ const DataList = ({ type, items }) => {
                             onClick={() => handleRowClick(item.id)}
                           >
                             <div className="flex flex-col">
-                              <div className="w-80 flex flex-row border border-b border-gray-500">
-                                <p className="w-1/2 border-r-2 border-gray-500 p-1">Name:</p> <span className="p-1">{getName(item)}</span>
+                              <div className="w-80 flex flex-row border border-b border-gray-300">
+                                <p className="w-1/2 border-r-2 border-gray-300 p-1">Name:</p> <span className="p-1">{getName(item)}</span>
                               </div>
-                              <div className="w-80 flex flex-row border border-b border-gray-500"> 
-                              <p className="w-1/2 border-r-2 border-gray-500 p-1">Phone:</p><span className="p-1">{item.phone}</span>
+                              <div className="w-80 flex flex-row border border-b border-gray-300"> 
+                              <p className="w-1/2 border-r-2 border-gray-300 p-1">Phone:</p><span className="p-1">{item.phone}</span>
                               </div>
                               {type === "learners" ? (
                                 <>
-                                  <div className="w-80 flex flex-row border border-b border-gray-500">
-                                  <p className="w-1/2 border-r-2 border-gray-500 p-1">Total Fee: </p><span className="p-1">{`${item.currency}/-`}</span>
+                                  <div className="w-80 flex flex-row border border-b border-gray-300">
+                                  <p className="w-1/2 border-r-2 border-gray-300 p-1">Total Fee: </p><span className="p-1">{`${item.currency}/-`}</span>
                                   </div>
                                 </>
                               ) : (
                                 <>
-                                  <div className="w-80 flex flex-row border border-b border-gray-500">
-                                  <p className="w-1/2 border-r-2 border-gray-500 p-1">Fee: </p><span className="p-1">{`${item.feeQuoted}/-`}</span>
+                                  <div className="w-80 flex flex-row border border-b border-gray-300">
+                                  <p className="w-1/2 border-r-2 border-gray-300 p-1">Fee: </p><span className="p-1">{`${item.feeQuoted}/-`}</span>
                                   </div>
                                 </>
                               )}

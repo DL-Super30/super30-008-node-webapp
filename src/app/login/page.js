@@ -37,11 +37,22 @@ export default function Login() {
     dispatch(checkLoginStatus());
   }, []);
 
+  useEffect(() => {
+    const newErrors = {};
+    if (login.error) {
+      console.log(login.error.data.error)
+      newErrors.apiError = login.error.data.error;
+      setErrors(newErrors);
+    }
+  }, [login.error]
+
+  )
+
   const validateForm = () => {
     const newErrors = {};
     if (!userName) {
       newErrors.userName = "Please enter username.";
-    }else if (/^[a-zA-Z0-9. _%+-]+@[a-zA-Z0-9. -]+\\. [a-zA-Z]{2,}$/.test(userName)) {
+    }else if (!/^[a-zA-Z0-9]{4,30}$/.test(userName)) {
       newErrors.userName = "Username is invalid";
     }
 
@@ -99,7 +110,10 @@ export default function Login() {
           </div>
 
           <div className="w-3/4 border rounded-lg border-gray-300 shadow-lg p-6 mt-8">
-            <div className="mb-4">
+            
+          {errors.apiError && (
+      <p className="text-red-500 text-sm mt-1">{errors.apiError}</p>
+    )}<div className="mb-4">
               <label
                 htmlFor="userName"
                 className="block text-sm  font-normal mb-1"

@@ -2103,15 +2103,6 @@ const DetailPage = () => {
                     {item?.lastname?.value}
                   </h1>
                 </div>
-
-                <div className="mx-3 ">
-                <button
-                    className="text-base bg-cyan-500 text-center px-3 py-1 border rounded-md"
-                    onClick={() => handleConvert()}
-                  >
-                    Convert
-                  </button>
-                </div>
               </div>
 
               <div className="flex justify-between mx-5 mt-2">

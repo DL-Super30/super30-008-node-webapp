@@ -180,7 +180,7 @@ export default function Dashboard() {
             "rgb(255, 99, 132)",
             "rgb(255, 180, 50)",
             "rgb(54, 162, 235)",
-            "rgb(255, 205, 86)",
+            "rgb(22, 163, 74)",
           ],
           borderWidth: 1,
         },

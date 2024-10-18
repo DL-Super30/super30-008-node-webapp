@@ -36,7 +36,7 @@ export default function Navbar() {
   return (
     <div>
       <nav className="pt-4 px-3 shadow-lg shadow-gray-200 fixed top-0 w-full z-30 bg-white">
-        <div className="flex gap-5 justify-between items-center">
+        <div className="flex flex-col md:flex-row gap-5 justify-between items-center">
           <div className="flex items-center gap-1">
             <button>
               <Image
@@ -44,7 +44,7 @@ export default function Navbar() {
                 alt="menu-icon-img"
                 width={30}
                 height={30}
-                className="inline-block"
+                className="inline-block pb-1 w-4 h-4 md:w-10 md:h-10"
               />
             </button>
             <button>
@@ -61,7 +61,7 @@ export default function Navbar() {
           </div>
           <div className="space-x-4">
             <div className="flex gap-5">
-              <div className="flex gap-5 text-base font-normal">
+            <div className="flex flex-shrink gap-5 text-sm md:text-base font-normal">
                 <button>
                   <Link
                     className={`text-black hover:text-black ${
@@ -148,7 +148,7 @@ export default function Navbar() {
                   </Link>
                 </button>
               </div>
-              <div className="flex space-x-1 m-0 p-0">
+              <div className="flex justify-between space-x-1 m-0 p-0 items-center">
                 <div>
                   <Image
                     src="/images/stars-icon.png"

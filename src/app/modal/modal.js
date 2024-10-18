@@ -1,9 +1,14 @@
 "use client";
+import { getCourseApi } from "@/slices/coursesSlice";
 import Image from "next/image";
-import React from "react";
+import React, { useEffect } from "react";
 import { useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import Select from 'react-select';
 
 export default function Modal({ isOpen, onClose, type, addNewItem }) {
+  const [multiSelectedOptions, setMultiSelectedOptions] = useState([]);
+  const [courseMultiOptions, setCourseMultiOptions] = useState([]);
   const [leadsData, setLeadsData] = useState({
     
     name: "",
@@ -86,6 +91,9 @@ export default function Modal({ isOpen, onClose, type, addNewItem }) {
    
   });
 
+  const courseList = useSelector((state) => state['courses']?.['courses']);
+  const dispatch = useDispatch();
+
   const handleSubmit = (e) => {
     e.preventDefault();
     let newItem;
@@ -99,10 +107,36 @@ export default function Modal({ isOpen, onClose, type, addNewItem }) {
     } else if (type === "courses") {
       newItem = { ...coursesData };
     }
-
+    if (newItem.course?.length > 0) {
+      newItem.course = newItem.course?.map(course => course.value);
+    }
     addNewItem(newItem);
     
     onClose();
+  };
+
+  useEffect(() => {
+    if ((!courseList || courseList?.length === 0)) {
+      dispatch(getCourseApi());
+    } else {
+      let courseOptions = courseList?.map(course => course.courseName);
+      courseOptions = [...new Set(courseOptions)];
+      const options = courseOptions.map(option => { return {'value': option, 'label': option }; });
+      setCourseMultiOptions(options);
+    }
+  }, [courseList]);
+
+  const handleMultiChange = (value, name) => {
+    if (type === "leads") {
+      setLeadsData({ ...leadsData, [name]: value });
+    } else if (type === "opportunities") {
+      setOpportunitiesData({ ...opportunitiesData, [name]: value });
+    } else if (type === "learners") {
+      setLearnersData({ ...learnersData, [name]: value });
+    } else if (type === "courses") {
+      setCoursesData({ ...coursesData, [name]: value });
+    }
+    // setMultiSelectedOptions(multiSelected);
   };
 
   const handleChange = (e) => {
@@ -119,7 +153,6 @@ export default function Modal({ isOpen, onClose, type, addNewItem }) {
       setCoursesData({ ...coursesData, [name]: value });
     }
   };
-
 
 console.log('yes');
 
@@ -254,14 +287,27 @@ console.log('yes');
               </div>
               <div className="mb-4">
                 <label className="block text-sm font-medium">Course</label>
-                <input
-                  type="text"
-                  className="w-full border-b-2 border-gray-300 p-2 rounded text-base font-medium focus-visible:outline-none "
-                  placeholder="Enter Course"
+                <Select
+                isMulti
+                  className="w-full border-b-2 border-gray-300 text-gray-800 rounded"
+                  placeholder="Course"
+                  options={courseMultiOptions}
                   value={leadsData.course}
                   name="course"
-                  onChange={handleChange}
+                onChange={e => handleMultiChange(e, 'course')}
                   required
+                  styles={{
+                    control: (provided, state) => ({
+                      ...provided,
+                      border: 'none', 
+                      padding: '0px', 
+                      margin: '0px', 
+                      boxShadow: 'none',
+                      '&:hover': {
+                        border: 'none',
+                      },
+                    }),
+                  }}
                 />
               </div>
               <div className="mb-4">
@@ -641,14 +687,28 @@ console.log('yes');
                 <label className="block text-base font-medium gap-2 text-gray-800 ">
                   Course
                 </label>
-                <input
-                  type="text"
-                  className="w-full border-b-2 border-gray-300 p-2 rounded text-base font-medium focus-visible:outline-none"
+                <Select
+                isMulti
+                  type=""
+                  className="w-full border-b-2 border-gray-300 text-gray-800 rounded"
                   placeholder="course"
+                  options={courseMultiOptions}
                   value={opportunitiesData.course}
                   name="course"
-                onChange={handleChange}
+                onChange={e => handleMultiChange(e, 'course')}
                 required
+                styles={{
+                  control: (provided, state) => ({
+                    ...provided,
+                    border: 'none', 
+                    padding: '0px', 
+                    margin: '0px', 
+                    boxShadow: 'none',
+                    '&:hover': {
+                      border: 'none',
+                    },
+                  }),
+                }}
                 />
               </div>
               <div className="mb-4">
