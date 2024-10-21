@@ -133,13 +133,13 @@ export default function Learners() {
     }
     // Case 3: Handle other cases (0 or multiple selections)
     else if (selectedLeads.length === 0) {
-      toast.warn('Please select at least one lead to update!', {
+      toast.warn('Please select at least one learner to update!', {
         position: "top-center",
         autoClose: 3000,
         theme: "colored",
       });
     } else {
-      toast.error('Please select only one lead to update at a time.', {
+      toast.error('Please select only one learner to update at a time.', {
         position: "top-center",
         autoClose: 3000,
         theme: "colored",
@@ -151,7 +151,7 @@ export default function Learners() {
     if (selectedLeads.length > 0) {
       setIsDeleteModalOpen(true);
     } else {
-      toast.warn('Please select at least one opportunity to delete!', {
+      toast.warn('Please select at least one learner to delete!', {
         position: "top-center",
         autoClose: 3000,
         hideProgressBar: false,
@@ -172,7 +172,7 @@ export default function Learners() {
       fetchLeads();
       setSelectedLeads([]);
       setIsDeleteModalOpen(false);
-      toast.success('Opportunities deleted successfully!', {
+      toast.success('learners deleted successfully!', {
         position: "top-center",
         autoClose: 3000,
         hideProgressBar: false,
@@ -183,8 +183,8 @@ export default function Learners() {
         theme: "colored",
       });
     } catch (error) {
-      console.error("Error deleting opportunities:", error);
-      toast.error('Failed to delete opportunities. Please try again.', {
+      console.error("Error deleting learners:", error);
+      toast.error('Failed to delete learners. Please try again.', {
         position: "top-center",
         autoClose: 3000,
         hideProgressBar: false,

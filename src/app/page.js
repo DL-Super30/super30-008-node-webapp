@@ -68,7 +68,7 @@ export default function Home() {
 
         setTimeout(() => {
           router.push("/dashboard");
-        }, 2000)
+        }, 1000)
       } else {
         setErrorMessage("Invalid username or password.");
       }

@@ -11,6 +11,7 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import UpdateModal from "../components/opportunityUpdate";
 import Image from 'next/image';
+import ConvertModal from "../components/convertModal";
 
 export default function Opportunities() {
   const [view, setView] = useState("table");
@@ -27,6 +28,8 @@ export default function Opportunities() {
   const [currentFilter, setCurrentFilter] = useState("All Opportunities");
   const dispatch = useDispatch();
   const router = useRouter();
+  const [ModalOpen, setModalOpen] = useState(false);
+  const [isConvertModalOpen, setIsConvertModalOpen] = useState(false);
 
   const { isModalOpen: isUpdateModalOpen } = useSelector(state => state.modal);
 
@@ -109,9 +112,9 @@ export default function Opportunities() {
   const totalPages = Math.ceil(filteredLeads.length / leadsPerPage);
 
   const handleCheckboxChange = (leadId) => {
-    setSelectedLeads(prevSelected =>
+    setSelectedLeads((prevSelected) =>
       prevSelected.includes(leadId)
-        ? prevSelected.filter(id => id !== leadId)
+        ? prevSelected.filter((id) => id !== leadId)
         : [...prevSelected, leadId]
     );
   };
@@ -133,17 +136,108 @@ export default function Opportunities() {
     } 
     // Case 3: Handle other cases (0 or multiple selections)
     else if (selectedLeads.length === 0) {
-      toast.warn('Please select at least one lead to update!', {
+      toast.warn('Please select at least one opportunity to update!', {
         position: "top-center",
         autoClose: 3000,
         theme: "colored",
       });
     } else {
-      toast.error('Please select only one lead to update at a time.', {
+      toast.error('Please select only one opportunity to update at a time.', {
         position: "top-center",
         autoClose: 3000,
         theme: "colored",
       });
+    }
+  };
+
+  // const handleConvertClick = () => {
+  //   setIsConvertModalOpen(true); // Open the modal
+  // };
+
+  const handleConfirmConversion = async () => {
+    setLoading(true);
+    try {
+      for (const leadId of selectedLeads) {
+        console.log(`Converting opportunity with ID: ${leadId}`);
+        const url = `${API_BASE_URL}/opportunity/${leadId}/convert`;
+        console.log(`API URL: ${url}`);
+
+        try {
+          const response = await axios.post(url);
+
+          console.log(`Response for ID ${leadId}:`, response.data);
+
+          if (response.status !== 200) {
+            throw new Error(`Failed to convert opportunity ${leadId}`);
+          }
+
+          console.log(`Opportunity ${leadId} converted to learner successfully:`, response.data);
+        } catch (error) {
+          console.error(`Error converting opportunity ${leadId}:`, error);
+          if (error.response) {
+            console.error('Error response:', error.response.data);
+            console.error('Error status:', error.response.status);
+            console.error('Error headers:', error.response.headers);
+          } else if (error.request) {
+            console.error('Error request:', error.request);
+          } else {
+            console.error('Error message:', error.message);
+          }
+          throw error;
+        }
+      }
+
+      setLoading(false);
+      setIsConvertModalOpen(false);
+      toast.success('Opportunities converted to learners successfully!', {
+        position: 'top-center',
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: 'colored',
+      });
+
+      fetchLeads();
+      setSelectedLeads([]);
+    } catch (error) {
+      console.error('Error in handleConfirmConversion:', error);
+      setLoading(false);
+      setIsConvertModalOpen(false);
+
+      let errorMessage = 'Failed to convert opportunities. Please try again.';
+      if (error.response && error.response.data) {
+        console.error('Error response:', error.response.data);
+        errorMessage = error.response.data.error || errorMessage;
+      } else if (error.request) {
+        console.error('Error request:', error.request);
+        errorMessage = 'No response received from server. Please try again later.';
+      }
+
+      toast.error(errorMessage, {
+        position: 'top-center',
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: 'colored',
+      });
+    }
+  };
+
+  const handleConvertClick = () => {
+    if (selectedLeads.length === 0) {
+      toast.warn('Please select at least one opportunity to convert.', {
+        position: 'top-center',
+        autoClose: 3000,
+        theme: 'colored',
+      });
+    } else {
+      setIsConvertModalOpen(true);
     }
   };
 
@@ -279,6 +373,7 @@ export default function Opportunities() {
               <ul className="absolute top-full mt-1 bg-white shadow-lg rounded-lg z-40 w-full sm:w-auto">
                 <li className="px-4 py-2 hover:bg-teal-100 cursor-pointer" onClick={()=>handleUpdateClick()}>Update</li>
                 <li className="px-4 py-2 hover:bg-teal-100 cursor-pointer" onClick={handleDeleteClick}>Delete</li>
+                <li className="px-4 py-2 hover:bg-teal-100 cursor-pointer" onClick={handleConvertClick}>Convert</li>
               </ul>
             )}
           </div>
@@ -503,6 +598,30 @@ export default function Opportunities() {
         onConfirm={handleDeleteConfirm}
       />
       <UpdateModal />
+      {isConvertModalOpen && (
+        <div className="fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded-lg shadow-lg w-80">
+            <h2 className="text-xl font-semibold mb-4">Confirm Conversion</h2>
+            <p className="mb-6">Are you sure you want to convert the selected opportunity/opportunities to learner(s)?</p>
+            <div className="flex justify-end">
+              <button
+                className="bg-gray-300 text-gray-800 px-4 py-2 rounded mr-2"
+                onClick={() => setIsConvertModalOpen(false)}
+              >
+                Cancel
+              </button>
+              <button
+                className="bg-teal-500 text-white px-4 py-2 rounded"
+                onClick={handleConfirmConversion}
+                disabled={loading}
+              >
+                {loading ? 'Converting...' : 'Confirm'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
     </div>
   );
 }
